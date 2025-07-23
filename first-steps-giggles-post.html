@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Steps and Giggles - Lucy and Lala's Adventures</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (like heart) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff0f5; /* Blush pink for an even cutesier feel */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 3rem; /* Space for footer */
+        }
+        .container {
+            max-width: 900px; /* Max width for content */
+            width: 100%;
+        }
+        .blog-article { /* Changed from .blog-section to .blog-article for the single main section */
+            background-color: #ffffff; /* White background for the article */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); /* Softer, more diffused shadow */
+            border: 4px solid #fecdd3; /* Rose pink, slightly thicker border */
+            border-radius: 2rem; /* More rounded corners */
+            overflow: hidden; /* Ensures rounded corners apply to children */
+            margin-bottom: 2.5rem; /* Space before footer */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
+            padding: 2.5rem; /* Padding for the entire article content */
+        }
+        .blog-article:hover {
+            transform: translateY(-8px); /* More pronounced lift on hover */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+        }
+        .btn-primary {
+            background-color: #ff85a2; /* Brighter, more vibrant pink */
+            color: #ffffff;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            border: 2px solid #ffffff; /* White border for a cute outline */
+        }
+        .btn-primary:hover {
+            background-color: #ff6b8f; /* Darker pink on hover */
+            transform: translateY(-3px) scale(1.05); /* More pronounced lift and slight scale */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+        }
+        .header-bg {
+            background-image: linear-gradient(to right, #fbcfe8, #fbc0f8); /* Softer, more magical gradient */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* Subtle text shadow for header */
+        }
+        h1 {
+            font-weight: 900; /* Even bolder font for the main title */
+        }
+        h2, h3 {
+            font-weight: 800; /* Bolder font for post titles */
+        }
+        .text-cutesy-pink {
+            color: #ff85a2; /* Custom cutesy pink color */
+        }
+        .like-button {
+            cursor: pointer;
+            font-size: 2.5rem; /* Larger heart icon */
+            color: #ccc; /* Default grey */
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .like-button.liked {
+            color: #ff6b8f; /* Pink when liked */
+            transform: scale(1.1);
+        }
+        .like-button:active {
+            transform: scale(0.9); /* Squish effect on click */
+        }
+        .media-block { /* New class for image/video containers within the single article */
+            position: relative;
+            padding-bottom: 75%; /* 4:3 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 1.5rem; /* Slightly less rounded than article for distinction */
+            margin-bottom: 2rem; /* Space below media */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Shadow for media */
+        }
+        .media-block img, .media-block video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures media covers the area */
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-600">
+    <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
+                    👣 First Steps and Giggles 💖
+                </h1>
+                <p class="text-xl md:text-2xl text-pink-800 font-semibold">
+                    An adventure with Lucy and Lala!
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Blog Post Content -->
+        <main class="w-full container mx-auto">
+            <article class="blog-article">
+                <h2 class="text-4xl font-extrabold text-cutesy-pink mb-6 text-center">Our Backyard Adventures Begin! ✨</h2>
+
+                <div class="media-block">
+                    <img src="https://i.imgur.com/jXcGCKg.png" alt="Lucy and Lala playing together">
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-8 text-lg">
+                    It's been an incredible journey watching Lucy and Lala discover the world around them. From their very first wobbly steps to their infectious giggles, every day is a new adventure. Today, they spent hours exploring the backyard, chasing butterflies (or at least trying to!🦋), and making friends with every leaf they found. Their bond is truly heartwarming to witness. Every little milestone is a cause for celebration in our home, and their joyful sounds fill our days with so much happiness. In this photo, you can see both Lucy and Lala in sweet, **light-colored (likely cream or off-white) long-sleeve tops, adorned with charming scattered red strawberry prints**🍓. These comfy shirts are perfect for all their outdoor explorations, keeping them cozy while they discover the wonders of nature. If you love this print, you can find similar adorable strawberry-themed clothes for toddlers at <a href="https://www.carters.com/search?q=strawberry+toddler+clothes" target="_blank" class="text-pink-600 font-bold hover:underline">Carter's</a>, <a href="https://oldnavy.gap.com/products/toddler-strawberry-clothes.jsp" target="_blank" class="text-pink-600 font-bold hover:underline">Old Navy</a>, or <a href="https://www.hannaandersson.com/search?q=strawberry+pajamas" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson</a>!
+                </p>
+
+                <h3 class="text-3xl font-extrabold text-cutesy-pink mb-4 text-center">Dressed for Adventure! 👗👕</h3>
+                <div class="media-block">
+                    <img src="https://i.imgur.com/fYODsNQ.png" alt="Lucy and Lala in new outfits">
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-8 text-lg">
+                    And speaking of adventures, they looked absolutely adorable in their new outfits from <a href="https://www.carters.com/" target="_blank" class="text-pink-600 font-bold hover:underline">Carter's</a>! In this picture, Lucy is sporting a sweet little floral romper, adorned with tiny pink and yellow blossoms🌼, perfect for her active crawling and curious explorations. The soft, breathable fabric ensures she stays comfortable no matter how many new things she discovers. Lala, on the other hand, is rocking a comfy striped tee in pastel blues and greens, paired with soft denim shorts that allow for maximum movement during her energetic play.
+                    <br><br>
+                    These clothes are not only super cute but also incredibly durable, standing up to all their playful tumbles🤸‍♀️, messy discoveries, and countless washes. We absolutely adore how <a href="https://www.carters.com/" target="_blank" class="text-pink-600 font-bold hover:underline">Carter's</a> designs their clothing with both style and practicality in mind, making dressing them for any occasion – from backyard adventures to cozy indoor play – an absolute breeze! Their thoughtful details, like easy-snap closures and expandable shoulders, make our lives as parents so much easier, allowing us more time to simply enjoy these precious moments.
+                </p>
+
+                <h3 class="text-3xl font-extrabold text-cutesy-pink mb-4 text-center">A Sweet Treat from Rita's! 🍦</h3>
+                <p class="text-gray-700 leading-relaxed mb-8 text-lg">
+                    After a day full of play and exploring, there's nothing better than a refreshing treat from <a href="https://www.ritasice.com/" target="_blank" class="text-pink-600 font-bold hover:underline">Rita's Italian Ice</a> to cool them down! In this photo, both girls are enjoying a delightful **Cherry-Lemonade** Italian Ice🍒🍋, a perfect blend of sweet and tangy that had them giggling with every spoonful. Their little faces lit up with pure joy, and it was clear this colorful, fruity treat was a definite highlight of their day! Lucy is wearing a pink t-shirt with a unicorn design🦄, and Lala is in a lavender t-shirt with a butterfly or floral pattern🦋, both looking equally happy with their icy treats.
+                    <br><br>
+                    We also have another memory of them enjoying Rita's, where they tried a vibrant **Strawberry Italian Ice**🍓. We love how Rita's offers such a wide variety of flavors, ensuring there's always something new and exciting for them to try. It's moments like these, filled with simple joys and delicious flavors, that make toddlerhood so magical and memorable.
+                </p>
+
+                <!-- Single Like Button for the entire article -->
+                <div class="flex flex-col items-center space-y-6 mt-12">
+                    <p class="text-xl font-semibold text-gray-700">Did you enjoy this delightful adventure?</p>
+                    <div class="flex items-center space-x-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <button class="btn-primary py-4 px-8 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Like This Post! ❤️
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl mt-6">
+                Back to All Adventures! 🎀
+            </a>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="w-full container mx-auto text-center mt-12 py-8 border-t-4 border-pink-300 rounded-t-3xl bg-white shadow-inner">
+            <p class="text-gray-600 text-lg font-bold">
+                &copy; 2025 Lucy and Lala's Adventures. All rights reserved. Made with extra love and sprinkles! ❤️✨
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Function to toggle the 'liked' state of the heart button
+        function toggleLike(element) {
+            element.classList.toggle('liked');
+            // You could add more logic here, like sending data to a server
+            // or incrementing a like count displayed next to the heart.
+        }
+    </script>
+</body>
+</html>
