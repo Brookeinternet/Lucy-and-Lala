@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Park Play & Hello Kitty Charm - Lucy and Lala's Adventures</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (like heart) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff0f5; /* Blush pink for an even cutesier feel */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 3rem; /* Space for footer */
+        }
+        .container {
+            max-width: 900px; /* Max width for content */
+            width: 100%;
+        }
+        .blog-section {
+            background-color: #ffffff; /* White background for sections */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); /* Softer, more diffused shadow */
+            border: 4px solid #fecdd3; /* Rose pink, slightly thicker border */
+            border-radius: 2rem; /* More rounded corners */
+            overflow: hidden; /* Ensures rounded corners apply to children */
+            margin-bottom: 2.5rem; /* Space between sections */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
+        }
+        .blog-section:hover {
+            transform: translateY(-8px); /* More pronounced lift on hover */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+        }
+        .btn-primary {
+            background-color: #ff85a2; /* Brighter, more vibrant pink */
+            color: #ffffff;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            border: 2px solid #ffffff; /* White border for a cute outline */
+        }
+        .btn-primary:hover {
+            background-color: #ff6b8f; /* Darker pink on hover */
+            transform: translateY(-3px) scale(1.05); /* More pronounced lift and slight scale */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+        }
+        .header-bg {
+            background-image: linear-gradient(to right, #fbcfe8, #fbc0f8); /* Softer, more magical gradient */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* Subtle text shadow for header */
+        }
+        h1 {
+            font-weight: 900; /* Even bolder font for the main title */
+        }
+        h2, h3 {
+            font-weight: 800; /* Bolder font for post titles */
+        }
+        .text-cutesy-pink {
+            color: #ff85a2; /* Custom cutesy pink color */
+        }
+        .like-button {
+            cursor: pointer;
+            font-size: 2.5rem; /* Larger heart icon */
+            color: #ccc; /* Default grey */
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .like-button.liked {
+            color: #ff6b8f; /* Pink when liked */
+            transform: scale(1.1);
+        }
+        .like-button:active {
+            transform: scale(0.9); /* Squish effect on click */
+        }
+        .image-container, .video-container {
+            position: relative;
+            padding-bottom: 75%; /* 4:3 Aspect Ratio (adjust as needed) */
+            height: 0;
+            overflow: hidden;
+            border-bottom: 4px solid #fecdd3; /* Border between media and text */
+        }
+        .image-container img, .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures media covers the area */
+        }
+        /* Lock Overlay Styles */
+        .locked-overlay {
+            background-color: rgba(255, 255, 255, 0.98); /* Almost opaque white */
+            position: fixed; /* Use fixed to cover entire viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            z-index: 9999; /* High z-index to ensure it's on top */
+        }
+        .locked-overlay h3 {
+            color: #ef4444; /* Red */
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .locked-overlay p {
+            color: #4b5563; /* Gray-700 */
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .locked-overlay a {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .locked-overlay a:hover {
+            background-color: #dc2626; /* Darker red */
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script>
+        const releaseDate = new Date('2025-08-01T00:00:00'); // Set release date to August 1st, 2025
+        const currentDate = new Date();
+        const isProSubscriber = localStorage.getItem('isProSubscriber') === 'true'; // Get Pro status
+
+        if (currentDate < releaseDate) {
+            // Article is date-locked for everyone
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.innerHTML = `
+                    <div class="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This delightful adventure will be released on August 1st, 2025!</p>
+                        <p>Check back soon to explore Lucy and Lala's park fun!</p>
+                        <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                            Back to All Adventures! 🎀
+                        </a>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            });
+        } else if (!isProSubscriber) {
+            // Article is Pro-locked if date has passed but not a Pro subscriber
+            document.addEventListener('DOMContentLoaded', () => {
+                const mainContent = document.querySelector('main');
+                if (mainContent) {
+                    mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                    mainContent.innerHTML = `
+                        <div class="pro-content-overlay">
+                            <h3>🔒 Pro Content Only!</h3>
+                            <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                            <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                        </div>
+                        ${mainContent.innerHTML}
+                    `;
+                    // Optionally blur or reduce opacity of content behind overlay
+                    const contentToBlur = mainContent.querySelector('article');
+                    if (contentToBlur) {
+                        contentToBlur.style.filter = 'blur(5px)';
+                        contentToBlur.style.pointerEvents = 'none';
+                    }
+                }
+            });
+        }
+    </script>
+
+    <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
+                    🌸 Park Play & Hello Kitty Charm! 🎀
+                </h1>
+                <p class="text-xl md:text-2xl text-pink-800 font-semibold">
+                    A delightful day out with Lucy and Lala! ✨
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Blog Post Content -->
+        <main class="w-full container mx-auto">
+            <!-- Section 1: Park Fun & Hello Kitty Dresses -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/C2BDyp6.jpeg" alt="Lucy and Lala at the park in Hello Kitty dresses">
+                </div>
+                <div class="p-8 text-center">
+                    <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">Sunshine, Smiles & Hello Kitty Style! ☀️🐱</h2>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        What a beautiful day for a park adventure with Lucy and Lala! The sun was shining, the grass was green, and their smiles were absolutely radiant. They were perfectly dressed for a day of outdoor fun in their adorable matching **Hello Kitty dresses from <a href="https://www2.hm.com/en_us/productpage.1154543023.html" target="_blank" class="text-pink-600 font-bold hover:underline">H&M</a>**!
+                        <br><br>
+                        These sleeveless, light pink dresses are covered in cheerful white Hello Kitty faces and tiny red heart accents💖, making them incredibly sweet and playful. The soft, breathable fabric is ideal for warm weather, allowing them to run, jump🤸‍♀️, and play comfortably without a care in the world. Their little red bows🎀 in their hair perfectly complement the dresses, adding an extra touch of cuteness. If you love this style, H&M also offers a cute <a href="https://www2.hm.com/en_us/productpage.1300354001.html" target="_blank" class="text-pink-600 font-bold hover:underline">2-Piece Set with Top and Leggings - White/Hello Kitty</a> that's perfect for cozy days! For even more character-themed fun, explore H&M's full range of <a href="https://www2.hm.com/en_us/kids/seasonal-trending/character.html" target="_blank" class="text-pink-600 font-bold hover:underline">character clothes and accessories for kids</a>! It's moments like these, filled with fresh air, laughter, and their favorite characters, that make childhood so magical!✨
+                    </p>
+                    <div class="flex justify-center items-center space-x-6 mt-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <a href="https://www2.hm.com/en_us/kids/new-arrivals/2-8.html" target="_blank" class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Find Their Style! 👗
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Playtime with Cute Toys -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/VLsZ4oS.jpeg" alt="Lucy and Lala holding cute toys at the park">
+                </div>
+                <div class="p-8 text-center">
+                    <h3 class="text-4xl font-extrabold text-cutesy-pink mb-4">Playful Pals in the Park! 💚💗</h3>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        No park trip is complete without some favorite toys! Lucy is proudly holding a vibrant green toy, but what makes this moment truly special is that it's her very own **homemade Labubu doll**! This unique, handcrafted doll, with its distinctive features, is a testament to her creativity and a truly special companion. It's wonderful to see her cherishing something made with so much love and imagination.
+                        <br><br>
+                        Lala, equally delighted, has a charming pink toy in her hands, also a unique creation, possibly another homemade Labubu doll or a similar whimsical figure. These dolls, with their bright colors and playful designs, are perfect companions for outdoor adventures, sparking imagination and encouraging interactive play. The girls' joyful expressions show just how much they cherish their little pals, bringing their own unique characters to life right there in the sunshine!☀️
+                        <br><br>
+                        For those inspired to create their own unique dolls or find adorable outfits for them, you can explore a wonderful selection of <a href="https://www.etsy.com/listing/4338031082/handmade-labubu-doll-clothes-fits-v1-v2?ls=a&ref=sold_out_ad-5&pro=1&frs=1&plkey=27441fcbffbe662613b269e7e4a923c64a92b3f1%3A4338031082" target="_blank" class="text-pink-600 font-bold hover:underline">handmade Labubu doll clothes on Etsy</a>, perfect for customizing your own beloved figures and adding even more personality to their playtime adventures! You can also find more official Labubu dolls and merchandise at the <a href="https://labubudollstore.com/collections/labubu-doll" target="_blank" class="text-pink-600 font-bold hover:underline">Labubu Doll Store</a>.
+                    </p>
+                    <div class="flex justify-center items-center space-x-6 mt-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <a href="https://labubudollstore.com/collections/labubu-doll" target="_blank" class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Discover More Toys! 🎁
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <div class="text-center mt-12">
+                <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl">
+                    Back to All Adventures! 🎀
+                </a>
+            </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="w-full container mx-auto text-center mt-12 py-8 border-t-4 border-pink-300 rounded-t-3xl bg-white shadow-inner">
+            <p class="text-gray-600 text-lg font-bold">
+                &copy; 2025 Lucy and Lala's Adventures. All rights reserved. Made with extra love and sprinkles! ❤️✨
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Function to toggle the 'liked' state of the heart button
+        function toggleLike(element) {
+            element.classList.toggle('liked');
+            // You could add more logic here, like sending data to a server
+            // or incrementing a like count displayed next to the heart.
+        }
+    </script>
+</body>
+</html>
