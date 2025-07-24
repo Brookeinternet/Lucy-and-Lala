@@ -90,9 +90,68 @@
             height: 100%;
             object-fit: cover; /* Ensures media covers the area */
         }
+        /* Lock Overlay Styles */
+        .locked-overlay {
+            background-color: rgba(255, 255, 255, 0.98); /* Almost opaque white */
+            position: fixed; /* Use fixed to cover entire viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            z-index: 9999; /* High z-index to ensure it's on top */
+        }
+        .locked-overlay h3 {
+            color: #ef4444; /* Red */
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .locked-overlay p {
+            color: #4b5563; /* Gray-700 */
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .locked-overlay a {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .locked-overlay a:hover {
+            background-color: #dc2626; /* Darker red */
+        }
     </style>
 </head>
 <body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script>
+        const releaseDate = new Date('2025-07-25T00:00:00'); // Set release date to July 25, 2025
+        const currentDate = new Date();
+
+        if (currentDate < releaseDate) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.innerHTML = `
+                    <div class="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This delightful adventure will be released on July 25th, 2025!</p>
+                        <p>Check back soon to explore Lucy and Lala's Target fun!</p>
+                        <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                            Back to All Adventures! 🎀
+                        </a>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            });
+        }
+    </script>
+
     <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
         <!-- Header Section -->
         <header class="w-full container mx-auto text-center mb-12">
@@ -195,11 +254,9 @@
                     </p>
                     <div class="flex justify-center items-center space-x-6 mt-6">
                         <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
-                        <button class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
-                              <a href="https://shop.mgae.com/collections/mgas-miniverse" target="_blank" class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                        <a href="https://shop.mgae.com/collections/mgas-miniverse" target="_blank" class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
                             Get Your Own Miniverse! 📦
-                             </a>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </section>
