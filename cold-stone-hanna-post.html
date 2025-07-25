@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cold Stone Fun & Hanna Andersson Style - Lucy and Lala's Adventures</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (like heart) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff0f5; /* Blush pink for an even cutesier feel */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 3rem; /* Space for footer */
+        }
+        .container {
+            max-width: 900px; /* Max width for content */
+            width: 100%;
+        }
+        .blog-section {
+            background-color: #ffffff; /* White background for sections */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); /* Softer, more diffused shadow */
+            border: 4px solid #fecdd3; /* Rose pink, slightly thicker border */
+            border-radius: 2rem; /* More rounded corners */
+            overflow: hidden; /* Ensures rounded corners apply to children */
+            margin-bottom: 2.5rem; /* Space between sections */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
+        }
+        .blog-section:hover {
+            transform: translateY(-8px); /* More pronounced lift on hover */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+        }
+        .btn-primary {
+            background-color: #ff85a2; /* Brighter, more vibrant pink */
+            color: #ffffff;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            border: 2px solid #ffffff; /* White border for a cute outline */
+        }
+        .btn-primary:hover {
+            background-color: #ff6b8f; /* Darker pink on hover */
+            transform: translateY(-3px) scale(1.05); /* More pronounced lift and slight scale */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+        }
+        .header-bg {
+            background-image: linear-gradient(to right, #fbcfe8, #fbc0f8); /* Softer, more magical gradient */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* Subtle text shadow for header */
+        }
+        h1 {
+            font-weight: 900; /* Even bolder font for the main title */
+        }
+        h2, h3 {
+            font-weight: 800; /* Bolder font for post titles */
+        }
+        .text-cutesy-pink {
+            color: #ff85a2; /* Custom cutesy pink color */
+        }
+        .like-button {
+            cursor: pointer;
+            font-size: 2.5rem; /* Larger heart icon */
+            color: #ccc; /* Default grey */
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .like-button.liked {
+            color: #ff6b8f; /* Pink when liked */
+            transform: scale(1.1);
+        }
+        .like-button:active {
+            transform: scale(0.9); /* Squish effect on click */
+        }
+        .image-container, .video-container {
+            position: relative;
+            padding-bottom: 75%; /* 4:3 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-bottom: 4px solid #fecdd3; /* Border between media and text */
+        }
+        .image-container img, .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures media covers the area */
+        }
+        .clothing-details ul, .flavor-chart ul {
+            list-style: none;
+            padding-left: 0;
+            text-align: left;
+            margin-top: 1rem;
+        }
+        .clothing-details li, .flavor-chart li {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: #4b5563;
+        }
+        .clothing-details li strong, .flavor-chart li strong {
+            color: #ff85a2;
+        }
+        .flavor-chart table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+        }
+        .flavor-chart th, .flavor-chart td {
+            border: 1px solid #fbcfe8;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .flavor-chart th {
+            background-color: #fbcfe8;
+            color: #831843;
+            font-weight: bold;
+        }
+        .flavor-chart td {
+            background-color: #fff5f8;
+        }
+        .flavor-chart .bonus-tips {
+            margin-top: 1.5rem;
+            text-align: left;
+            font-size: 1.125rem;
+            color: #4b5563;
+        }
+        .flavor-chart .bonus-tips ul {
+            list-style: disc;
+            padding-left: 1.5rem;
+        }
+        /* Lock Overlay Styles */
+        .locked-overlay {
+            background-color: rgba(255, 255, 255, 0.98); /* Almost opaque white */
+            position: fixed; /* Use fixed to cover entire viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            z-index: 9999; /* High z-index to ensure it's on top */
+        }
+        .locked-overlay h3 {
+            color: #ef4444; /* Red */
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .locked-overlay p {
+            color: #4b5563; /* Gray-700 */
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .locked-overlay a {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .locked-overlay a:hover {
+            background-color: #dc2626; /* Darker red */
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script>
+        const releaseDate = new Date('2025-08-04T00:00:00'); // Set release date to August 4th, 2025
+        const currentDate = new Date();
+        const isProSubscriber = localStorage.getItem('isProSubscriber') === 'true'; // Get Pro status
+
+        if (currentDate < releaseDate) {
+            // Article is date-locked for everyone
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.innerHTML = `
+                    <div class="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This delightful adventure will be released on August 4th, 2025!</p>
+                        <p>Check back soon to explore Lucy and Lala's Cold Stone fun!</p>
+                        <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                            Back to All Adventures! 🎀
+                        </a>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            });
+        } else if (!isProSubscriber) {
+            // Article is Pro-locked if date has passed but not a Pro subscriber
+            document.addEventListener('DOMContentLoaded', () => {
+                const mainContent = document.querySelector('main');
+                if (mainContent) {
+                    mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                    mainContent.innerHTML = `
+                        <div class="pro-content-overlay">
+                            <h3>🔒 Pro Content Only!</h3>
+                            <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                            <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                        </div>
+                        ${mainContent.innerHTML}
+                    `;
+                    // Optionally blur or reduce opacity of content behind overlay
+                    const contentToBlur = mainContent.querySelector('article');
+                    if (contentToBlur) {
+                        contentToBlur.style.filter = 'blur(5px)';
+                        contentToBlur.style.pointerEvents = 'none';
+                    }
+                }
+            });
+        }
+    </script>
+
+    <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
+                    🍦 Cold Stone Sweetness & Hanna Andersson Hugs! 💖
+                </h1>
+                <p class="text-xl md:text-2xl text-pink-800 font-semibold">
+                    A delicious adventure with Lucy and Lala! ✨
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Blog Post Content -->
+        <main class="w-full container mx-auto">
+            <!-- Section 1: Cold Stone Excitement -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/nQp6Gat.png" alt="Lucy and Lala at Cold Stone with ice cream">
+                </div>
+                <div class="p-8 text-center">
+                    <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">Ice Cream Dreams Come True at Cold Stone! 🍨🌈</h2>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        There's nothing quite like the magic of <a href="https://www.coldstonecreamery.com/" target="_blank" class="text-pink-600 font-bold hover:underline">Cold Stone Creamery</a>, especially when you're a toddler! Lucy and Lala's eyes were wide with wonder as they watched their custom ice cream creations being mixed on the frozen granite stone. The anticipation was almost as sweet as the treat itself!🍦 In this adorable photo, you can see their pure joy as they dig into their delicious cups. Lucy, always a fan of classic flavors,  enjoyed a delightful scoop of Strawberry Ice Cream🍓, with its natural fruity sweetness. Lala, ever adventurous, was engrossed in her cup of Cake Batter Ice Cream🎂, a fun and festive choice! Every spoonful was met with a happy giggle and a delighted smile. It's truly a sensory experience for them, from the vibrant colors🌈 to the creamy textures and, of course, the incredible flavors!😋
+                    </p>
+
+                    <div class="flavor-chart mt-8">
+                        <h3 class="text-3xl font-extrabold text-cutesy-pink mb-4 text-center">🍦 Cold Stone Creamery Kids' Ice Cream Flavor Chart 🎨</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>🎨 Color</th>
+                                    <th>🍨 Flavor Name</th>
+                                    <th>💬 What It Tastes Like</th>
+                                    <th>🌟 Fun Fact / Idea</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>🍫 Brown</td>
+                                    <td>Chocolate</td>
+                                    <td>Like a chocolate bar! 🍫</td>
+                                    <td>Add M&M’s for a double chocolate blast!</td>
+                                </tr>
+                                <tr>
+                                    <td>🍦 Cream</td>
+                                    <td>Sweet Cream</td>
+                                    <td>Tastes like vanilla cake batter 🎂</td>
+                                    <td>Great base for toppings!</td>
+                                </tr>
+                                <tr>
+                                    <td>🌈 Rainbow</td>
+                                    <td>Cotton Candy</td>
+                                    <td>Just like a carnival! 🎡</td>
+                                    <td>Mix with marshmallows for magic! ✨</td>
+                                </tr>
+                                <tr>
+                                    <td>🍓 Pink</td>
+                                    <td>Strawberry</td>
+                                    <td>Real fruity and berry good! 🍓</td>
+                                    <td>Try it with gummy bears! 🐻</td>
+                                </tr>
+                                <tr>
+                                    <td>🍪 Tan/Brown</td>
+                                    <td>Cookie Dough</td>
+                                    <td>Like cookie dough straight from the bowl! 🍪</td>
+                                    <td>Try it in a cone for extra yum! 🍦</td>
+                                </tr>
+                                <tr>
+                                    <td>💜 Purple</td>
+                                    <td>Cake Batter</td>
+                                    <td>Tastes like birthday cake! 🎉</td>
+                                    <td>Add sprinkles and you're ready to party!</td>
+                                </tr>
+                                <tr>
+                                    <td>🍌 Yellow</td>
+                                    <td>Banana</td>
+                                    <td>Creamy banana smoothie taste 🍌</td>
+                                    <td>Delicious with fudge drizzle! 🍫</td>
+                                </tr>
+                                <tr>
+                                    <td>🌊 Light Blue</td>
+                                    <td>Blue Cotton Candy</td>
+                                    <td>Whimsical and sweet! 💙</td>
+                                    <td>Add whipped cream and a cherry! 🍒</td>
+                                </tr>
+                                <tr>
+                                    <td>🍭 Pink/Blue</td>
+                                    <td>Bubble Gum</td>
+                                    <td>Chewy, sweet bubblegum pop! 💗💙</td>
+                                    <td>Add popping candy for fun fizz! 🎆</td>
+                                </tr>
+                                <tr>
+                                    <td>🍑 Light Orange</td>
+                                    <td>Mango</td>
+                                    <td>Fruity and tropical! 🏝️</td>
+                                    <td>Mix with strawberries for a smoothie feel!</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="bonus-tips">
+                            <h4 class="text-xl font-bold text-cutesy-pink mt-6 mb-2">🌟 Bonus Tips for Kids:</h4>
+                            <ul>
+                                <li>👯‍♀️ Mix Flavors! Try chocolate + cake batter = birthday brownie blast!</li>
+                                <li>🍬 Add Mix-ins! Candy, fruit, or sprinkles can turn any scoop into a masterpiece!</li>
+                                <li>🎉 Create Your Own! Name your mix like “Unicorn Crunch” or “Dino Swirl!”</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center items-center space-x-6 mt-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <a href="https://www.coldstonecreamery.com/icecream/createyourown/index.html" target="_blank" class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Find Your Flavor! 🍦
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Hanna Andersson Outfits -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/l1mOlwX.png" alt="Lucy and Lala in Hanna Andersson outfits at Cold Stone">
+                </div>
+                <div class="p-8 text-center">
+                    <h3 class="text-4xl font-extrabold text-cutesy-pink mb-4">Comfy & Colorful in Hanna Andersson! 💖👕</h3>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        Even for an ice cream adventure, comfort is key, and Lucy and Lala were perfectly outfitted in their cozy <a href="https://www.hannaandersson.com/" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson</a> clothes!
+                        <br><br>
+                        In this picture, Lucy is wearing an absolutely charming Bold Floral Sleeveless Romper / Jumpsuit🌸. This playful romper showcases a vibrant floral print—large white and yellow blooms against a coral-pink background—on lightweight cotton or a soft cotton blend. It has adjustable shoulder straps, a front button placket, and flouncy leg hems with ruffle detailing. Designed to be breezy and fun for warm-weather wear, it's perfect for a sweet treat outing!
+                        <br><br>
+                        Lala is equally adorable in her classic Red Corduroy Cross-Back Overalls❤️. These cozy overalls are crafted from soft, pre-washed cotton corduroy in a rich Hanna-red shade. They feature adjustable cross-back straps, an elasticized back waist for comfort and easy dressing, and a wide-leg fit that’s perfect for playtime. Practical design details include side-snap leg closures for diaper access or potty breaks, and front/back pockets.
+                        <br><br>
+                        We absolutely adore <a href="https://www.hannaandersson.com/" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson</a> for their commitment to super-soft organic cotton and their "hand-me-down quality" that truly lasts. Their clothes are designed for play, wash beautifully, and retain their shape and color, making them perfect for active toddlers like Lucy and Lala. Plus, their bright, cheerful designs always bring an extra dose of happiness to their outfits!✨
+                    </p>
+                    <div class="clothing-details text-left mx-auto max-w-md">
+                        <h4 class="text-xl font-bold text-cutesy-pink mb-2 text-center">🔗 Where to View or Shop Online:</h4>
+                        <ul>
+                            <li>✨ Red Corduroy Overalls (Hanna Red): <a href="https://www.hannaandersson.com/girls-clothes-rompers/83320-31P.html?dwvar_83320-31P_color=31P&cgid=null" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson Product Page</a> or via Hanna-Me-Downs preloved site: <a href="https://preloved.hannaandersson.com/product/corduroy-overalls-hanna-red---a11f8ea0-788d-5a74-9f07-79c11fa40ca9?utm_source=chatgpt.com" target="_blank" class="text-pink-600 font-bold hover:underline">"Corduroy Overalls – Hanna Red" listing</a></li>
+                            <li>✨ Bold Floral Sleeveless Romper / Jumpsuit Styles: Browse under "Floral Romper – Multi Rose" or similar listings via Hanna-Me-Downs preloved shop: <a href="https://preloved.hannaandersson.com/product/baby-girls-floral-romper-multi-rose/1000000000000000000" target="_blank" class="text-pink-600 font-bold hover:underline">Floral Romper – Multi Rose (Preloved)</a> or <a href="https://www.hannaandersson.com/girls-clothes-rompers/82945-43B.html?dwvar_82945-43B_color=43B&cgid=null" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson Floral Romper Product Page</a></li>
+                        </ul>
+                    </div>
+                    <div class="flex justify-center items-center space-x-6 mt-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <a href="https://www.hannaandersson.com/" target="_blank" class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Shop Hanna's Styles! 🛍️
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Sweet Moments, Close Up! -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/qYme5XE.png" alt="Lucy and Lala enjoying ice cream close up in waffle bowls">
+                </div>
+                <div class="p-8 text-center">
+                    <h3 class="text-4xl font-extrabold text-cutesy-pink mb-4">Sweet Moments, Close Up! 😋💖</h3>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        Just look at those happy faces!😄 This close-up captures the pure bliss of enjoying a favorite treat. In this picture, Lucy and Lala are savoring scoops of rich, decadent Chocolate Ice Cream🍫, generously mixed with delightful chunks of brownie bits and cookie dough🍪. The combination creates a textural wonderland, with creamy smoothness meeting chewy surprises in every bite, all nestled perfectly in their crispy waffle bowls. You can almost taste the yummy goodness and feel the cool sensation of the ice cream. These are the moments we live for – seeing their little eyes light up with simple pleasures and discovering new favorite flavors. It's a reminder to savor every sweet, messy, and joyful moment of toddlerhood!✨
+                    </p>
+                    <div class="flex justify-center items-center space-x-6 mt-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <button class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Share the Sweetness! 📸
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Pure Joy -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/ux4j28G.png" alt="Lucy and Lala smiling with ice cream">
+                </div>
+                <div class="p-8 text-center">
+                    <h3 class="text-4xl font-extrabold text-cutesy-pink mb-4">Smiles All Around! 😄✨</h3>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        And finally, a picture that truly captures the essence of a perfect day: big, bright smiles from both Lucy and Lala! Their faces are beaming, full of the happiness that only ice cream and good company can bring. It's clear they had an absolute blast at Cold Stone, making memories that are as sweet as their treats. These genuine expressions of joy are what make every adventure, big or small, so incredibly rewarding. Here's to many more happy moments and delicious discoveries!💖
+                    </p>
+                    <div class="flex justify-center items-center space-x-6 mt-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <button class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Back to All Adventures! 🎀
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="text-center mt-12">
+                <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl">
+                    Back to All Adventures! 🎀
+                </a>
+            </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="w-full container mx-auto text-center mt-12 py-8 border-t-4 border-pink-300 rounded-t-3xl bg-white shadow-inner">
+            <p class="text-gray-600 text-lg font-bold">
+                &copy; 2025 Lucy and Lala's Adventures. All rights reserved. Made with extra love and sprinkles! ❤️✨
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Function to toggle the 'liked' state of the heart button
+        function toggleLike(element) {
+            element.classList.toggle('liked');
+            // You could add more logic here, like sending data to a server
+            // or incrementing a like count displayed next to the heart.
+        }
+    </script>
+</body>
+</html>
