@@ -51,10 +51,41 @@
         .text-cutesy-pink {
             color: #ff85a2; /* Custom cutesy pink color */
         }
-        .auth-status {
-            background-color: #fef3c7; /* Light yellow for status */
+        .auth-status, .auth-form-container {
+            background-color: #fef3c7; /* Light yellow for status/form */
             border: 2px solid #fcd34d; /* Yellow border */
             color: #92400e; /* Darker yellow text */
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .auth-form-container input {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #fcd34d;
+            margin-bottom: 0.75rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .auth-form-container button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .auth-form-container .btn-auth-primary {
+            background-color: #6366f1; /* Indigo */
+            color: white;
+        }
+        .auth-form-container .btn-auth-primary:hover {
+            background-color: #4f46e5;
+        }
+        .auth-form-container .btn-auth-secondary {
+            background-color: #fcd34d; /* Yellow */
+            color: #92400e;
+        }
+        .auth-form-container .btn-auth-secondary:hover {
+            background-color: #fbbf24;
         }
         .pro-subscriber-callout, .donation-callout, .articles-list-callout {
             background-image: linear-gradient(to right, #a78bfa, #c4b5fd); /* Violet gradient */
@@ -153,11 +184,48 @@
 </head>
 <body class="antialiased text-gray-600">
     <div class="min-h-screen flex flex-col items-center py-8 px-4">
-        <!-- Firebase Auth Status -->
-        <div id="auth-status" class="w-full container mx-auto text-center p-4 rounded-lg auth-status mb-8 hidden">
-            <p class="font-semibold text-lg" id="auth-message"></p>
-            <p class="text-sm" id="user-id"></p>
-            <button id="sign-out-button" class="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors">Sign Out</button>
+        <!-- Firebase Auth Status and Forms -->
+        <div id="auth-container" class="w-full container mx-auto text-center mb-8">
+            <div id="auth-status" class="p-4 hidden">
+                <p class="font-semibold text-lg" id="auth-message"></p>
+                <p class="text-sm" id="user-id"></p>
+                <button id="sign-out-button" class="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors">Sign Out</button>
+            </div>
+
+            <div id="auth-form-container" class="auth-form-container hidden">
+                <form id="login-form" class="space-y-4">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Login to Your Account</h3>
+                    <input type="email" id="login-email" placeholder="Email" required class="block">
+                    <input type="password" id="login-password" placeholder="Password" required class="block">
+                    <button type="submit" class="btn-auth-primary w-full">Login</button>
+                    <p class="text-sm">
+                        Don't have an account? <a href="#" id="show-signup" class="text-indigo-600 hover:underline">Sign Up</a>
+                    </p>
+                    <p class="text-sm">
+                        <a href="#" id="show-forgot-password" class="text-indigo-600 hover:underline">Forgot Password?</a>
+                    </p>
+                </form>
+
+                <form id="signup-form" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Create New Account</h3>
+                    <input type="email" id="signup-email" placeholder="Email" required class="block">
+                    <input type="password" id="signup-password" placeholder="Password" required class="block">
+                    <button type="submit" class="btn-auth-primary w-full">Sign Up</button>
+                    <p class="text-sm">
+                        Already have an account? <a href="#" id="show-login" class="text-indigo-600 hover:underline">Login</a>
+                    </p>
+                </form>
+
+                <form id="forgot-password-form" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Reset Password</h3>
+                    <input type="email" id="reset-email" placeholder="Enter your email" required class="block">
+                    <button type="submit" class="btn-auth-primary w-full">Send Reset Email</button>
+                    <p class="text-sm">
+                        <a href="#" id="back-to-login" class="text-indigo-600 hover:underline">Back to Login</a>
+                    </p>
+                </form>
+                <p id="auth-error-message" class="text-red-600 text-sm mt-2"></p>
+            </div>
         </div>
 
         <!-- Header Section -->
@@ -205,9 +273,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="target-toys-carters-post" target="_blank" data-pro="false">
+                    <a href="target-toys-carters-post" target="_blank" data-pro="true">
                         <img src="https://i.imgur.com/L985f9t.png" alt="Target Fun & Toy Treasures Thumbnail" class="article-thumbnail">
-                        <span>🎯 Target Fun & Toy Treasures!</span>
+                        <span>🎯 Target Fun & Toy Treasures! <span class="pro-badge">PRO</span></span>
                         <span class="release-date">Released: July 25</span>
                     </a>
                 </li>
@@ -320,7 +388,7 @@
                 <div class="md:w-1/2 text-center md:text-left">
                     <h2 class="text-5xl font-extrabold text-cutesy-pink mb-5">First Steps and Giggles 👣</h2>
                     <p class="text-gray-700 leading-relaxed mb-8 text-xl">
-                        It's been an incredible journey watching Lucy and Lala discover the world around them. From their very first wobbly steps to their infectious giggles, every day is a new adventure. Today, they spent hours exploring the backyard, chasing butterflies (or at least trying to!), and making friends with every leaf they found. Their bond is truly heartwarming to witness. And speaking of adventures, they looked absolutely adorable in their new outfits from <a href="#" class="text-pink-600 font-bold hover:underline">Carter's</a>, perfect for all their outdoor explorations! After a day full of play, there's nothing better than a refreshing treat from <a href="#" class="text-pink-600 font-bold hover:underline">Rita's Italian Ice</a> to cool them down.
+                        It's been an incredible journey watching Lucy and Lala discover the world around them. From their very first wobbly steps to their infectious giggles, every day is a new adventure. Today, they spent hours exploring the backyard, chasing butterflies (or at least trying to!🦋), and making friends with every leaf they found. Their bond is truly heartwarming to witness. Every little milestone is a cause for celebration in our home, and their joyful sounds fill our days with so much happiness. In this photo, you can see both Lucy and Lala in sweet, **light-colored (likely cream or off-white) long-sleeve tops, adorned with charming scattered red strawberry prints**🍓. These comfy shirts are perfect for all their outdoor explorations, keeping them cozy while they discover the wonders of nature. If you love this print, you can find similar adorable strawberry-themed clothes for toddlers at <a href="https://www.carters.com/search?q=strawberry+toddler+clothes" target="_blank" class="text-pink-600 font-bold hover:underline">Carter's</a>, <a href="https://oldnavy.gap.com/products/toddler-strawberry-clothes.jsp" target="_blank" class="text-pink-600 font-bold hover:underline">Old Navy</a>, or <a href="https://www.hannaandersson.com/search?q=strawberry+pajamas" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson</a>!
                     </p>
                     <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl">
                         Read More Cuteness! 🎀
@@ -388,10 +456,16 @@
         </footer>
     </div>
 
+    <script src="https://js.stripe.com/v3/"></script>
     <script type="module">
         // Firebase imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Initialize Stripe.js with your publishable key
+        const stripe = Stripe('pk_live_51Ro7nNReyOAsAwqJH3XMcYCu0yYudEZ4sDCQfUfYLe7ECg4jRslHvnMX5WOIx7c7wfSxkSNwJrBeKnF9KnDyAoXR00eyCtYQGI');
+
 
         // Global variables for Firebase config and app ID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -401,78 +475,220 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
+        let currentUserId = null;
+
+        // Auth UI Elements
+        const authContainer = document.getElementById('auth-container');
         const authStatusDiv = document.getElementById('auth-status');
+        const authFormContainer = document.getElementById('auth-form-container');
         const authMessage = document.getElementById('auth-message');
         const userIdDisplay = document.getElementById('user-id');
         const signOutButton = document.getElementById('sign-out-button');
+        const authErrorMessage = document.getElementById('auth-error-message');
 
-        // Set isProSubscriber to true permanently
-        const isProSubscriber = true; 
+        // Forms and their toggles
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
+        const showSignupLink = document.getElementById('show-signup');
+        const showLoginLink = document.getElementById('show-login');
+        const showForgotPasswordLink = document.getElementById('show-forgot-password');
+        const backToLoginLink = document.getElementById('back-to-login');
+
+        // Input fields
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        const signupEmailInput = document.getElementById('signup-email');
+        const signupPasswordInput = document.getElementById('signup-password');
+        const resetEmailInput = document.getElementById('reset-email');
+
+        // --- Helper Functions for UI Toggling ---
+        function showForm(formToShow) {
+            loginForm.classList.add('hidden');
+            signupForm.classList.add('hidden');
+            forgotPasswordForm.classList.add('hidden');
+            authErrorMessage.textContent = ''; // Clear previous errors
+            formToShow.classList.remove('hidden');
+        }
+
+        showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
+        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+        showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
+        backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+
+        // --- Firebase Auth Functions ---
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
 
         // Function to update UI based on auth state
-        function updateAuthUI(user) {
+        async function updateAuthUI(user) {
             if (user) {
+                authFormContainer.classList.add('hidden');
                 authStatusDiv.classList.remove('hidden');
                 authMessage.textContent = 'You are signed in!';
                 userIdDisplay.textContent = `User ID: ${user.uid}`;
+                await updateProStatusUI(); // Update Pro status display after user is known
             } else {
                 authStatusDiv.classList.add('hidden');
+                authFormContainer.classList.remove('hidden');
+                showForm(loginForm); // Show login form by default
                 authMessage.textContent = 'Not signed in.';
                 userIdDisplay.textContent = '';
             }
         }
 
-        // Function to update Pro Status UI (simplified as status is always true)
-        function updateProStatusUI() {
-            // No toggle button, so just ensure PRO badges are visible if data-pro is true
+        // Function to update Pro Status UI (reads from Firestore)
+        async function updateProStatusUI() {
+            const isProSubscriber = await getProSubscriberStatus(); // Get status from Firestore
             const articleLinks = document.querySelectorAll('.articles-list a');
             articleLinks.forEach(link => {
+                let proBadge = link.querySelector('.pro-badge');
                 if (link.dataset.pro === 'true') {
-                    let proBadge = link.querySelector('.pro-badge');
                     if (!proBadge) {
                         const span = document.createElement('span');
                         span.className = 'pro-badge';
                         span.textContent = 'PRO';
                         link.querySelector('span:not(.release-date)').appendChild(span);
                     }
+                } else {
+                    if (proBadge) {
+                        proBadge.remove();
+                    }
                 }
             });
         }
 
-        // Handle clicks on article links (now always accessible if PRO)
-        document.querySelectorAll('.articles-list a').forEach(link => {
-            link.addEventListener('click', function(event) {
-                // Since isProSubscriber is always true, no restriction logic needed here
-                // The data-pro attribute and badge are purely for display now.
-            });
+        // --- Event Listeners for Forms ---
+
+        // Login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginEmailInput.value;
+            const password = loginPasswordInput.value;
+            authErrorMessage.textContent = '';
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                alert('Successfully logged in!'); // Replace with custom modal
+            } catch (error) {
+                console.error("Login error:", error);
+                authErrorMessage.textContent = error.message;
+            }
         });
 
+        // Sign Up
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = signupEmailInput.value;
+            const password = signupPasswordInput.value;
+            authErrorMessage.textContent = '';
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                alert('Account created successfully! You are now logged in.'); // Replace with custom modal
+            } catch (error) {
+                console.error("Sign up error:", error);
+                authErrorMessage.textContent = error.message;
+            }
+        });
 
-        // Sign out function
+        // Forgot Password
+        forgotPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = resetEmailInput.value;
+            authErrorMessage.textContent = '';
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Password reset email sent! Check your inbox.'); // Replace with custom modal
+                showForm(loginForm); // Go back to login form
+            } catch (error) {
+                console.error("Password reset error:", error);
+                authErrorMessage.textContent = error.message;
+            }
+        });
+
+        // Sign Out
         signOutButton.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                alert('You have been signed out.'); // Using alert for simple demo, replace with custom modal in production
+                alert('You have been signed out.'); // Using alert for simple demo
             } catch (error) {
                 console.error("Error signing out:", error);
                 alert('Error signing out. Please try again.'); // Using alert for simple demo
             }
         });
 
-        // Listen for authentication state changes
+        // Handle clicks on article links (now checks Firestore status)
+        document.querySelectorAll('.articles-list a').forEach(link => {
+            link.addEventListener('click', async function(event) {
+                const isProArticle = this.dataset.pro === 'true';
+                const isUserPro = await getProSubscriberStatus(); // Check live Firestore status
+
+                if (isProArticle && !isUserPro) {
+                    event.preventDefault(); // Stop navigation
+                    alert('This content is for Pro Subscribers only! Please subscribe to unlock.'); // Custom modal would be better
+                    window.open('https://buy.stripe.com/eVq00ldtC8408cxfZwabK00', '_blank'); // Redirect to Stripe
+                }
+            });
+        });
+
+        // Initial Auth State Check and Anonymous/Custom Token Sign-in
         onAuthStateChanged(auth, (user) => {
             updateAuthUI(user);
             if (!user) {
-                // Attempt to sign in if not already authenticated
+                // If no user is signed in, attempt anonymous or custom token sign-in
                 if (initialAuthToken) {
                     signInWithCustomToken(auth, initialAuthToken)
                         .then((userCredential) => {
                             console.log("Signed in with custom token:", userCredential.user.uid);
+                            // updateAuthUI will be called again by onAuthStateChanged listener
                         })
                         .catch((error) => {
                             console.error("Error signing in with custom token:", error);
-                            // Fallback to anonymous if custom token fails
                             signInAnonymously(auth)
                                 .then(() => console.log("Signed in anonymously (fallback)."))
                                 .catch(e => console.error("Error signing in anonymously:", e));
@@ -484,9 +700,6 @@
                 }
             }
         });
-
-        // Initial UI update on load
-        updateProStatusUI();
     </script>
 </body>
 </html>
