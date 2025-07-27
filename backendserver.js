@@ -14,7 +14,7 @@ const admin = require('firebase-admin'); // Firebase Admin SDK
 // 1. Firebase Admin SDK Initialization
 // You need to download a service account key JSON file from your Firebase project settings:
 // Project settings -> Service accounts -> Generate new private key
-const serviceAccount = require('./Lucy-and-Lala/blob/main/firebasekey.json'); // <--- REPLACE THIS PATH
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   // Replace with your actual database URL from Firebase Project Settings -> Database
@@ -25,11 +25,7 @@ const db = admin.firestore();
 
 // 2. Stripe Initialization
 // Replace with your actual Stripe Secret Key (sk_live_...)
-const stripe = Stripe('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'); // <--- REPLACE WITH YOUR STRIPE SECRET KEY
 
-// 3. Stripe Webhook Secret
-// Get this from your Stripe Dashboard -> Developers -> Webhooks -> Select your endpoint -> Click to reveal secret
-const stripeWebhookSecret = 'whsec_U18Pa8dBVgz99nZyntdZhcBPnuKJgl8O'; // <--- REPLACE WITH YOUR WEBHOOK SECRET
 
 // 4. Your Stripe Price IDs
 const PRO_SUBSCRIPTION_PRICE_ID = 'price_1Ro7rMReyOAsAwqJwRz0TYwd';
@@ -37,7 +33,7 @@ const SWEET_ROLL_PRODUCT_PRICE_ID = 'price_1Ro7tKReyOAsAwqJDgaezn5Q';
 const DONUT_PRODUCT_PRICE_ID = 'price_1Ro7toReyOAsAwqJXl7LoSwU';
 
 // Your Firebase App ID (used for Firestore collection paths)
-const FIREBASE_APP_ID = 'lucyandlala'; // This should match your Firebase project ID or __app_id
+
 
 // --- Express App Setup ---
 const app = express();
