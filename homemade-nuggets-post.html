@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homemade Nuggets & Happy Eaters - Lucy and Lala's Adventures</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (like heart) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff0f5; /* Blush pink for an even cutesier feel */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 3rem; /* Space for footer */
+        }
+        .container {
+            max-width: 900px; /* Max width for content */
+            width: 100%;
+        }
+        .blog-article { /* Changed from .blog-section to .blog-article for the single main section */
+            background-color: #ffffff; /* White background for the article */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); /* Softer, more diffused shadow */
+            border: 4px solid #fecdd3; /* Rose pink, slightly thicker border */
+            border-radius: 2rem; /* More rounded corners */
+            overflow: hidden; /* Ensures rounded corners apply to children */
+            margin-bottom: 2.5rem; /* Space before footer */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
+            padding: 2.5rem; /* Padding for the entire article content */
+        }
+        .blog-article:hover {
+            transform: translateY(-8px); /* More pronounced lift on hover */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+        }
+        .btn-primary {
+            background-color: #ff85a2; /* Brighter, more vibrant pink */
+            color: #ffffff;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            border: 2px solid #ffffff; /* White border for a cute outline */
+        }
+        .btn-primary:hover {
+            background-color: #ff6b8f; /* Darker pink on hover */
+            transform: translateY(-3px) scale(1.05); /* More pronounced lift and slight scale */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+        }
+        .header-bg {
+            background-image: linear-gradient(to right, #fbcfe8, #fbc0f8); /* Softer, more magical gradient */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* Subtle text shadow for header */
+        }
+        h1 {
+            font-weight: 900; /* Even bolder font for the main title */
+        }
+        h2, h3 {
+            font-weight: 800; /* Bolder font for post titles */
+        }
+        .text-cutesy-pink {
+            color: #ff85a2; /* Custom cutesy pink color */
+        }
+        .like-button {
+            cursor: pointer;
+            font-size: 2.5rem; /* Larger heart icon */
+            color: #ccc; /* Default grey */
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .like-button.liked {
+            color: #ff6b8f; /* Pink when liked */
+            transform: scale(1.1);
+        }
+        .like-button:active {
+            transform: scale(0.9); /* Squish effect on click */
+        }
+        .media-block { /* New class for image/video containers within the single article */
+            position: relative;
+            padding-bottom: 75%; /* 4:3 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-bottom: 4px solid #fecdd3; /* Border between media and text */
+        }
+        .media-block img, .media-block video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures media covers the area */
+        }
+        /* Lock Overlay Styles */
+        .locked-overlay {
+            background-color: rgba(255, 255, 255, 0.98); /* Almost opaque white */
+            position: fixed; /* Use fixed to cover entire viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            z-index: 9999; /* High z-index to ensure it's on top */
+        }
+        .locked-overlay h3 {
+            color: #ef4444; /* Red */
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .locked-overlay p {
+            color: #4b5563; /* Gray-700 */
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .locked-overlay a {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .locked-overlay a:hover {
+            background-color: #dc2626; /* Darker red */
+        }
+        /* Pro Content Overlay Styles */
+        .pro-content-overlay {
+            background-color: rgba(255, 255, 255, 0.95);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            z-index: 10;
+            border-radius: 2rem;
+        }
+        .pro-content-overlay h3 {
+            color: #ef4444; /* Red */
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .pro-content-overlay p {
+            color: #4b5563; /* Gray-700 */
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .pro-content-overlay a {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .pro-content-overlay a:hover {
+            background-color: #dc2626; /* Darker red */
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase config and app ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserId = null; // To store the authenticated user's UID
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
+        const releaseDate = new Date('2025-08-16T00:00:00'); // Set release date to August 16th, 2025
+        const currentDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Ensure Firebase Auth is ready before checking status
+            await new Promise(resolve => {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                    }
+                    resolve();
+                });
+            });
+
+            if (currentDate < releaseDate) {
+                // Article is date-locked for everyone
+                document.body.innerHTML = `
+                    <div class="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This exclusive cooking adventure will be released on August 16th, 2025!</p>
+                        <p>Check back soon to see how the girls became little chefs!</p>
+                        <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                            Back to All Adventures! 🎀
+                        </a>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            } else {
+                // Article is released, now check Pro status
+                const isProSubscriber = await getProSubscriberStatus();
+                if (!isProSubscriber) {
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                        mainContent.innerHTML = `
+                            <div class="pro-content-overlay">
+                                <h3>🔒 Pro Content Only!</h3>
+                                <p>This exclusive cooking adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                                <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                            </div>
+                            ${mainContent.innerHTML}
+                        `;
+                        // Optionally blur or reduce opacity of content behind overlay
+                        const contentToBlur = mainContent.querySelector('article');
+                        if (contentToBlur) {
+                            contentToBlur.style.filter = 'blur(5px)';
+                            contentToBlur.style.pointerEvents = 'none';
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
+                    🍗 Homemade Nuggets & Happy Eaters! 💖
+                </h1>
+                <p class="text-xl md:text-2xl text-pink-800 font-semibold">
+                    A delicious cooking adventure with Lucy and Lala! ✨
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Blog Post Content - Now a single section -->
+        <main class="w-full container mx-auto">
+            <article class="blog-article">
+                <h2 class="text-4xl font-extrabold text-cutesy-pink mb-6 text-center">Our Homemade Nugget Journey! 👩‍🍳👨‍🍳</h2>
+
+                <div class="media-block">
+                    <img src="https://i.imgur.com/oZPNSY5.png" alt="Lucy and Lala helping prepare food">
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-8 text-lg">
+                    Today was a special day in the kitchen as Lucy and Lala helped us prepare a delicious homemade meal! We decided to try a fantastic homemade chicken nugget recipe from <a href="https://www.yummytoddlerfood.com/category/recipes/dinner/" target="_blank" class="text-pink-600 font-bold hover:underline">Yummy Toddler Food</a>, a website we absolutely love for its healthy and kid-friendly recipes. The girls were so excited to be involved, from mixing ingredients to shaping the nuggets. Their little hands were busy, and their giggles filled the kitchen – it's amazing how much fun cooking can be when you have tiny helpers! This recipe proved to be incredibly easy to follow, making the process enjoyable for everyone involved, even with two curious toddlers "assisting" every step of the way.
+                </p>
+
+                <h3 class="text-3xl font-extrabold text-cutesy-pink mb-4 text-center">Golden Goodness, Ready to Munch! 🌟🍗</h3>
+                <div class="media-block">
+                    <img src="https://i.imgur.com/xZnwbcq.jpeg" alt="Homemade chicken nuggets ready to eat">
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-8 text-lg">
+                    And here they are – our perfectly golden, homemade chicken nuggets! They turned out so crispy on the outside and tender on the inside, just begging to be dipped. The aroma filled the kitchen, promising a delicious outcome. It's such a great feeling to know exactly what's in their food, made with love right here at home. Even better, seeing their anticipation grow as the nuggets cooled was a joy. These nuggets are definitely a new family favorite, proving that healthy can be incredibly tasty!
+                </p>
+
+                <h3 class="text-3xl font-extrabold text-cutesy-pink mb-4 text-center">Taste Test Success! 😄👍</h3>
+                <div class="media-block">
+                    <img src="https://i.imgur.com/J6ayBbQ.jpeg" alt="Lucy and Lala enjoying homemade chicken nuggets">
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-8 text-lg">
+                    The moment of truth! Lucy and Lala's reactions to their homemade chicken nuggets were absolutely priceless. Big smiles and enthusiastic munching confirmed that this recipe is a winner! It's so rewarding to see them enjoy healthy, homemade food with such gusto. We paired them with some colorful steamed broccoli and sweet potato fries, making for a balanced and incredibly satisfying meal. Their happy faces are all the proof we need that healthy eating can be super fun and delicious, especially when they've had a hand in making it!
+                </p>
+
+                <h3 class="text-3xl font-extrabold text-cutesy-pink mb-4 text-center">Our Go-To for Kid-Friendly Recipes: Yummy Toddler Food! 🥦🍎</h3>
+                <div class="media-block">
+                    <img src="https://i.imgur.com/f50ab5.jpg" alt="Yummy Toddler Food website screenshot">
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                    We can't recommend <a href="https://www.yummytoddlerfood.com/category/recipes/dinner/" target="_blank" class="text-pink-600 font-bold hover:underline">Yummy Toddler Food</a> enough! It's our absolute go-to resource for nutritious, easy-to-make, and genuinely delicious recipes that even the pickiest eaters will love. From main courses like these chicken nuggets to snacks, breakfast ideas, and even healthy dessert options, their site is packed with inspiration and practical advice. Their focus on simple, wholesome ingredients and practical tips makes healthy cooking for toddlers a breeze, helping parents navigate mealtime challenges with confidence. If you're looking to add more wholesome and kid-approved meals to your family's menu, definitely check them out – your little ones (and your taste buds!) will thank you!
+                </p>
+
+                <!-- Single Like Button for the entire article -->
+                <div class="flex flex-col items-center space-y-6 mt-12">
+                    <p class="text-xl font-semibold text-gray-700">Did you enjoy this delicious cooking adventure?</p>
+                    <div class="flex items-center space-x-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <button class="btn-primary py-4 px-8 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Like This Post! ❤️
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl mt-6">
+                Back to All Adventures! 🎀
+            </a>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="w-full container mx-auto text-center mt-12 py-8 border-t-4 border-pink-300 rounded-t-3xl bg-white shadow-inner">
+            <p class="text-gray-600 text-lg font-bold">
+                &copy; 2025 Lucy and Lala's Adventures. All rights reserved. Made with extra love and sprinkles! ❤️✨
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Function to toggle the 'liked' state of the heart button
+        function toggleLike(element) {
+            element.classList.toggle('liked');
+            // You could add more logic here, like sending data to a server
+            // or incrementing a like count displayed next to the heart.
+        }
+    </script>
+</body>
+</html>
