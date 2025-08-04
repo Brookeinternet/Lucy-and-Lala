@@ -169,32 +169,137 @@
         .locked-overlay a:hover {
             background-color: #dc2626; /* Darker red */
         }
+        /* Pro Content Overlay Styles */
+        .pro-content-overlay {
+            background-color: rgba(255, 255, 255, 0.95);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            z-index: 10;
+            border-radius: 2rem;
+        }
+        .pro-content-overlay h3 {
+            color: #ef4444; /* Red */
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .pro-content-overlay p {
+            color: #4b5563; /* Gray-700 */
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .pro-content-overlay a {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .pro-content-overlay a:hover {
+            background-color: #dc2626; /* Darker red */
+        }
     </style>
-
-
 </head>
 <body class="antialiased text-gray-600">
     <!-- Content Lock Script -->
-    <script>
-        const releaseDate = new Date('2025-08-10T00:00:00'); // Set release date to August 23, 2025
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase config and app ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserId = null; // To store the authenticated user's UID
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
+        const releaseDate = new Date('2025-08-23T00:00:00'); // Set release date to August 23rd, 2025
         const currentDate = new Date();
 
-        if (currentDate < releaseDate) {
-            document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Ensure Firebase Auth is ready before checking status
+            await new Promise(resolve => {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                    }
+                    resolve();
+                });
+            });
+
+            if (currentDate < releaseDate) {
+                // Article is date-locked for everyone
                 document.body.innerHTML = `
                     <div class="locked-overlay">
                         <h3>🔒 Coming Soon!</h3>
-                       <p>This delightful adventure will be released on August 23rd, 2025!</p>
+                        <p>This delightful adventure will be released on August 23rd, 2025!</p>
                         <p>Check back soon to see Lala's special coffee moment!</p>
                         <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
                             Back to All Adventures! 🎀
                         </a>
                     </div>
                 `;
-                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
-            });
-        }
-     `;
                 document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
             } else {
                 // Article is released, now check Pro status
@@ -222,8 +327,6 @@
             }
         });
     </script>
-
-           
 
     <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
         <!-- Header Section -->
@@ -317,7 +420,7 @@
                 </div>
             </article>
 
-            <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl mt-6">
+            <a href="index.html" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl mt-6">
                 Back to All Adventures! 🎀
             </a>
         </main>
@@ -501,9 +604,164 @@ Here is the corrected and updated HTML for the "Lala's Special Coffee Moment!" a
             font-size: 1.25rem;
             line-height: 1.5rem; /* Align emoji with text */
         }
+        /* Lock Overlay Styles */
+        .locked-overlay {
+            background-color: rgba(255, 255, 255, 0.98); /* Almost opaque white */
+            position: fixed; /* Use fixed to cover entire viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            z-index: 9999; /* High z-index to ensure it's on top */
+        }
+        .locked-overlay h3 {
+            color: #ef4444; /* Red */
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .locked-overlay p {
+            color: #4b5563; /* Gray-700 */
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .locked-overlay a {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .locked-overlay a:hover {
+            background-color: #dc2626; /* Darker red */
+        }
     </style>
 </head>
 <body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase config and app ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserId = null; // To store the authenticated user's UID
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
+        const releaseDate = new Date('2025-08-23T00:00:00'); // Set release date to August 23rd, 2025
+        const currentDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Ensure Firebase Auth is ready before checking status
+            await new Promise(resolve => {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                    }
+                    resolve();
+                });
+            });
+
+            if (currentDate < releaseDate) {
+                // Article is date-locked for everyone
+                document.body.innerHTML = `
+                    <div class="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This delightful adventure will be released on August 23rd, 2025!</p>
+                        <p>Check back soon to see Lala's special coffee moment!</p>
+                        <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                            Back to All Adventures! 🎀
+                        </a>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            } else {
+                // Article is released, now check Pro status
+                const isProSubscriber = await getProSubscriberStatus();
+                if (!isProSubscriber) {
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                        mainContent.innerHTML = `
+                            <div class="pro-content-overlay">
+                                <h3>🔒 Pro Content Only!</h3>
+                                <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                                <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                            </div>
+                            ${mainContent.innerHTML}
+                        `;
+                        // Optionally blur or reduce opacity of content behind overlay
+                        const contentToBlur = mainContent.querySelector('article');
+                        if (contentToBlur) {
+                            contentToBlur.style.filter = 'blur(5px)';
+                            contentToBlur.style.pointerEvents = 'none';
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
     <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
         <!-- Header Section -->
         <header class="w-full container mx-auto text-center mb-12">
@@ -580,7 +838,7 @@ Here is the corrected and updated HTML for the "Lala's Special Coffee Moment!" a
                         If you loved Lala's special moment, you can virtually treat her to a yummy sweet roll (representing a $5 contribution)! Every little bit helps us share more of Lucy and Lala's joyful adventures with you. Thank you for your support!
                     </p>
                     <a href="https://buy.stripe.com/eVq6oJdtCckg1O928GabK02" target="_blank" class="sweet-roll-button py-3 px-6 rounded-full inline-block font-bold text-lg shadow-md hover:shadow-lg">
-                        Give Lala a Sweet Roll ($5) 🎉
+                        Give a Sweet Roll ($5) 🎉
                     </a>
                 </div>
 
@@ -633,5 +891,3 @@ Here is the corrected and updated HTML for the "Lala's Special Coffee Moment!" a
     </script>
 </body>
 </html>
-
-    
