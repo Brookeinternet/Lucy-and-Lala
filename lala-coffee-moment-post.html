@@ -249,19 +249,37 @@
                     resolve();
                 });
             });
+                    border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .locked-overlay a:hover {
+            background-color: #dc2626; /* Darker red */
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script>
+        const releaseDate = new Date('2025-08-10T00:00:00'); // Set release date to August 23, 2025
+        const currentDate = new Date();
 
-            if (currentDate < releaseDate) {
-                // Article is date-locked for everyone
+        if (currentDate < releaseDate) {
+            document.addEventListener('DOMContentLoaded', () => {
                 document.body.innerHTML = `
                     <div class="locked-overlay">
                         <h3>🔒 Coming Soon!</h3>
-                        <p>This delightful adventure will be released on August 23rd, 2025!</p>
+                       <p>This delightful adventure will be released on August 23rd, 2025!</p>
                         <p>Check back soon to see Lala's special coffee moment!</p>
                         <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
                             Back to All Adventures! 🎀
                         </a>
                     </div>
                 `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            });
+        }
+     `;
                 document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
             } else {
                 // Article is released, now check Pro status
@@ -289,6 +307,8 @@
             }
         });
     </script>
+
+           
 
     <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
         <!-- Header Section -->
