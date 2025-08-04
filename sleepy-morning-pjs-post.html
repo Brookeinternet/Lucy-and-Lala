@@ -176,21 +176,31 @@
 
         // Global variables for Firebase config and app ID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app = null;
+        let auth = null;
+        let db = null;
+        let currentUserId = null;
 
-        let currentUserId = null; // To store the authenticated user's UID
+        // Initialize Firebase services only if config is available
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase services initialized.");
+        } else {
+            console.warn("Firebase config not found. Authentication and Pro status will not be available.");
+        }
+        
 
         /**
          * Gets the current authenticated user's UID.
          * @returns {Promise<string|null>} The user's UID or null if not authenticated.
          */
         async function getAuthenticatedUserId() {
+            if (!auth) return null;
             return new Promise(resolve => {
                 const unsubscribe = onAuthStateChanged(auth, (user) => {
                     unsubscribe(); // Stop listening once we have a user
@@ -209,6 +219,7 @@
          * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
          */
         async function getProSubscriberStatus() {
+            if (!db) return false;
             const userId = await getAuthenticatedUserId();
 
             if (!userId) {
@@ -236,15 +247,36 @@
         const currentDate = new Date();
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // Ensure Firebase Auth is ready before checking status
-            await new Promise(resolve => {
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUserId = user.uid;
-                    }
-                    resolve();
+            // Wait for auth to be ready
+            if (auth) {
+                 await new Promise(resolve => {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            currentUserId = user.uid;
+                        } else {
+                             // If no user is signed in, attempt anonymous or custom token sign-in
+                            if (initialAuthToken) {
+                                signInWithCustomToken(auth, initialAuthToken)
+                                    .then((userCredential) => {
+                                        console.log("Signed in with custom token:", userCredential.user.uid);
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error signing in with custom token:", error);
+                                        signInAnonymously(auth)
+                                            .then(() => console.log("Signed in anonymously (fallback)."))
+                                            .catch(e => console.error("Error signing in anonymously:", e));
+                                    });
+                            } else {
+                                signInAnonymously(auth)
+                                    .then(() => console.log("Signed in anonymously."))
+                                    .catch(e => console.error("Error signing in anonymously:", e));
+                            }
+                        }
+                        resolve();
+                    });
                 });
-            });
+            }
+
 
             if (currentDate < releaseDate) {
                 // Article is date-locked for everyone
