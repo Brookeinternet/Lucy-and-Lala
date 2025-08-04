@@ -170,73 +170,12 @@
             background-color: #dc2626; /* Darker red */
         }
     </style>
-</head>
-<body class="antialiased text-gray-600">
+       
     <!-- Content Lock Script -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global variables for Firebase config and app ID
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentUserId = null; // To store the authenticated user's UID
-
-        /**
-         * Gets the current authenticated user's UID.
-         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
-         */
-        async function getAuthenticatedUserId() {
-            return new Promise(resolve => {
-                const unsubscribe = onAuthStateChanged(auth, (user) => {
-                    unsubscribe(); // Stop listening once we have a user
-                    if (user) {
-                        currentUserId = user.uid;
-                        resolve(user.uid);
-                    } else {
-                        resolve(null);
-                    }
-                });
-            });
-        }
-
-        /**
-         * Fetches a user's subscriber status from Firestore.
-         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
-         */
-        async function getProSubscriberStatus() {
-            const userId = await getAuthenticatedUserId();
-
-            if (!userId) {
-                console.warn("Cannot get subscriber status: User not authenticated.");
-                return false;
-            }
-
-            try {
-                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
-                const docSnap = await getDoc(userDocRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    return data.isProSubscriber === true;
-                } else {
-                    return false;
-                }
-            } catch (error) {
-                console.error("Error fetching subscriber status:", error);
-                return false;
-            }
-        }
-
-        const releaseDate = new Date('2025-08-23T00:00:00'); // Set release date to August 23rd, 2025
+    <script>
+        </head>
+<body class="antialiased text-gray-600">
+const releaseDate = new Date('2025-08-23T00:00:00'); // Set release date to August 23rd, 2025
         const currentDate = new Date();
 
         document.addEventListener('DOMContentLoaded', async () => {
