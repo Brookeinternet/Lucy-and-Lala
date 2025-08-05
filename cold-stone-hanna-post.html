@@ -170,18 +170,160 @@
         .locked-overlay a:hover {
             background-color: #dc2626; /* Darker red */
         }
+        /* Pro Content Overlay Styles */
+        .pro-content-overlay {
+            background-color: rgba(255, 255, 255, 0.95);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            z-index: 10;
+            border-radius: 2rem;
+        }
+        .pro-content-overlay h3 {
+            color: #ef4444; /* Red */
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .pro-content-overlay p {
+            color: #4b5563; /* Gray-700 */
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .pro-content-overlay a {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .pro-content-overlay a:hover {
+            background-color: #dc2626; /* Darker red */
+        }
     </style>
 </head>
 <body class="antialiased text-gray-600">
     <!-- Content Lock Script -->
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase config and app ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app = null;
+        let auth = null;
+        let db = null;
+        let currentUserId = null;
+
+        // Initialize Firebase services only if config is available and has an API key
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase services initialized.");
+        } else {
+            console.warn("Firebase config not found or invalid. Authentication and Pro status will not be available.");
+        }
+        
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            if (!auth) return null; // Return null if auth is not initialized
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            if (!db) return false; // Return false if db is not initialized
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
         const releaseDate = new Date('2025-08-04T00:00:00'); // Set release date to August 4th, 2025
         const currentDate = new Date();
-        const isProSubscriber = localStorage.getItem('isProSubscriber') === 'true'; // Get Pro status
 
-        if (currentDate < releaseDate) {
-            // Article is date-locked for everyone
-            document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Only attempt auth and lock if Firebase is initialized
+            if (auth) {
+                // Ensure Firebase Auth is ready before checking status
+                await new Promise(resolve => {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            currentUserId = user.uid;
+                        } else {
+                            // If no user is signed in, attempt anonymous or custom token sign-in
+                            if (initialAuthToken) {
+                                signInWithCustomToken(auth, initialAuthToken)
+                                    .then((userCredential) => {
+                                        console.log("Signed in with custom token:", userCredential.user.uid);
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error signing in with custom token:", error);
+                                        signInAnonymously(auth)
+                                            .then(() => console.log("Signed in anonymously (fallback)."))
+                                            .catch(e => console.error("Error signing in anonymously:", e));
+                                    });
+                            } else {
+                                signInAnonymously(auth)
+                                    .then(() => console.log("Signed in anonymously."))
+                                    .catch(e => console.error("Error signing in anonymously:", e));
+                            }
+                        }
+                        resolve();
+                    });
+                });
+            }
+
+
+            if (currentDate < releaseDate) {
+                // Article is date-locked for everyone
                 document.body.innerHTML = `
                     <div class="locked-overlay">
                         <h3>🔒 Coming Soon!</h3>
@@ -193,30 +335,31 @@
                     </div>
                 `;
                 document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
-            });
-        } else if (!isProSubscriber) {
-            // Article is Pro-locked if date has passed but not a Pro subscriber
-            document.addEventListener('DOMContentLoaded', () => {
-                const mainContent = document.querySelector('main');
-                if (mainContent) {
-                    mainContent.style.position = 'relative'; // Ensure overlay positions correctly
-                    mainContent.innerHTML = `
-                        <div class="pro-content-overlay">
-                            <h3>🔒 Pro Content Only!</h3>
-                            <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
-                            <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
-                        </div>
-                        ${mainContent.innerHTML}
-                    `;
-                    // Optionally blur or reduce opacity of content behind overlay
-                    const contentToBlur = mainContent.querySelector('article');
-                    if (contentToBlur) {
-                        contentToBlur.style.filter = 'blur(5px)';
-                        contentToBlur.style.pointerEvents = 'none';
+            } else {
+                // Article is released, now check Pro status
+                const isProSubscriber = await getProSubscriberStatus();
+                if (!isProSubscriber) {
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                        mainContent.innerHTML = `
+                            <div class="pro-content-overlay">
+                                <h3>🔒 Pro Content Only!</h3>
+                                <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                                <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                            </div>
+                            ${mainContent.innerHTML}
+                        `;
+                        // Optionally blur or reduce opacity of content behind overlay
+                        const contentToBlur = mainContent.querySelector('section');
+                        if (contentToBlur) {
+                            contentToBlur.style.filter = 'blur(5px)';
+                            contentToBlur.style.pointerEvents = 'none';
+                        }
                     }
                 }
-            });
-        }
+            }
+        });
     </script>
 
     <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
@@ -348,17 +491,17 @@
                     <p class="text-gray-700 leading-relaxed mb-6 text-lg">
                         Even for an ice cream adventure, comfort is key, and Lucy and Lala were perfectly outfitted in their cozy <a href="https://www.hannaandersson.com/" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson</a> clothes!
                         <br><br>
-                        In this picture, Lucy is wearing an absolutely charming Bold Floral Sleeveless Romper / Jumpsuit🌸. This playful romper showcases a vibrant floral print—large white and yellow blooms against a coral-pink background—on lightweight cotton or a soft cotton blend. It has adjustable shoulder straps, a front button placket, and flouncy leg hems with ruffle detailing. Designed to be breezy and fun for warm-weather wear, it's perfect for a sweet treat outing!
+                        In this picture, Lucy is wearing an absolutely charming **Bold Floral Sleeveless Romper / Jumpsuit**🌸. This playful romper showcases a vibrant floral print—large white and yellow blooms against a coral-pink background—on lightweight cotton or a soft cotton blend. It has adjustable shoulder straps, a front button placket, and flouncy leg hems with ruffle detailing. Designed to be breezy and fun for warm-weather wear, it's perfect for a sweet treat outing!
                         <br><br>
-                        Lala is equally adorable in her classic Red Corduroy Cross-Back Overalls❤️. These cozy overalls are crafted from soft, pre-washed cotton corduroy in a rich Hanna-red shade. They feature adjustable cross-back straps, an elasticized back waist for comfort and easy dressing, and a wide-leg fit that’s perfect for playtime. Practical design details include side-snap leg closures for diaper access or potty breaks, and front/back pockets.
+                        Lala is equally adorable in her classic **Red Corduroy Cross-Back Overalls**❤️. These cozy overalls are crafted from soft, pre-washed cotton corduroy in a rich Hanna-red shade. They feature adjustable cross-back straps, an elasticized back waist for comfort and easy dressing, and a wide-leg fit that’s perfect for playtime. Practical design details include side-snap leg closures for diaper access or potty breaks, and front/back pockets.
                         <br><br>
                         We absolutely adore <a href="https://www.hannaandersson.com/" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson</a> for their commitment to super-soft organic cotton and their "hand-me-down quality" that truly lasts. Their clothes are designed for play, wash beautifully, and retain their shape and color, making them perfect for active toddlers like Lucy and Lala. Plus, their bright, cheerful designs always bring an extra dose of happiness to their outfits!✨
                     </p>
                     <div class="clothing-details text-left mx-auto max-w-md">
                         <h4 class="text-xl font-bold text-cutesy-pink mb-2 text-center">🔗 Where to View or Shop Online:</h4>
                         <ul>
-                            <li>✨ Red Corduroy Overalls (Hanna Red): <a href="https://www.hannaandersson.com/girls-clothes-rompers/83320-31P.html?dwvar_83320-31P_color=31P&cgid=null" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson Product Page</a> or via Hanna-Me-Downs preloved site: <a href="https://preloved.hannaandersson.com/product/corduroy-overalls-hanna-red---a11f8ea0-788d-5a74-9f07-79c11fa40ca9?utm_source=chatgpt.com" target="_blank" class="text-pink-600 font-bold hover:underline">"Corduroy Overalls – Hanna Red" listing</a></li>
-                            <li>✨ Bold Floral Sleeveless Romper / Jumpsuit Styles: Browse under "Floral Romper – Multi Rose" or similar listings via Hanna-Me-Downs preloved shop: <a href="https://preloved.hannaandersson.com/product/baby-girls-floral-romper-multi-rose/1000000000000000000" target="_blank" class="text-pink-600 font-bold hover:underline">Floral Romper – Multi Rose (Preloved)</a> or <a href="https://www.hannaandersson.com/girls-clothes-rompers/82945-43B.html?dwvar_82945-43B_color=43B&cgid=null" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson Floral Romper Product Page</a></li>
+                            <li>✨ **Red Corduroy Overalls (Hanna Red):** <a href="https://www.hannaandersson.com/girls-clothes-rompers/83320-31P.html?dwvar_83320-31P_color=31P&cgid=null" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson Product Page</a> or via Hanna-Me-Downs preloved site: <a href="https://preloved.hannaandersson.com/product/corduroy-overalls-hanna-red---a11f8ea0-788d-5a74-9f07-79c11fa40ca9?utm_source=chatgpt.com" target="_blank" class="text-pink-600 font-bold hover:underline">"Corduroy Overalls – Hanna Red" listing</a></li>
+                            <li>✨ **Bold Floral Sleeveless Romper / Jumpsuit Styles:** Browse under "Floral Romper – Multi Rose" or similar listings via Hanna-Me-Downs preloved shop: <a href="https://preloved.hannaandersson.com/product/baby-girls-floral-romper-multi-rose/1000000000000000000" target="_blank" class="text-pink-600 font-bold hover:underline">Floral Romper – Multi Rose (Preloved)</a> or <a href="https://www.hannaandersson.com/girls-clothes-rompers/82945-43B.html?dwvar_82945-43B_color=43B&cgid=null" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson Floral Romper Product Page</a></li>
                         </ul>
                     </div>
                     <div class="flex justify-center items-center space-x-6 mt-6">
@@ -409,7 +552,7 @@
             </section>
 
             <div class="text-center mt-12">
-                <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl">
+                <a href="index.html" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl">
                     Back to All Adventures! 🎀
                 </a>
             </div>
@@ -430,6 +573,20 @@
             // You could add more logic here, like sending data to a server
             // or incrementing a like count displayed next to the heart.
         }
+
+        // Function for the sweet roll button (placeholder for actual payment integration)
+        function giveSweetRoll() {
+            alert('Thank you for giving Lala a sweet roll! Your virtual $5 contribution is much appreciated!');
+            // In a real application, this would integrate with a payment gateway.
+        }
+
+        // Attach event listener to the sweet roll button
+        document.addEventListener('DOMContentLoaded', function() {
+            const sweetRollButton = document.querySelector('.sweet-roll-button');
+            if (sweetRollButton) {
+                sweetRollButton.addEventListener('click', giveSweetRoll);
+            }
+        });
     </script>
 </body>
 </html>
