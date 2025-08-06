@@ -1,0 +1,426 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Lucy and Lala's Adventures</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (like heart) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff0f5; /* Blush pink for an even cutesier feel */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 3rem; /* Space for footer */
+        }
+        .container {
+            max-width: 900px; /* Max width for content */
+            width: 100%;
+        }
+        .profile-section {
+            background-color: #ffffff;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border: 4px solid #fecdd3;
+            border-radius: 2rem;
+            padding: 2.5rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .header-bg {
+            background-image: linear-gradient(to right, #fbcfe8, #fbc0f8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-weight: 900;
+        }
+        h2, h3 {
+            font-weight: 800;
+        }
+        .text-cutesy-pink {
+            color: #ff85a2;
+        }
+        .btn-primary {
+            background-color: #ff85a2;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            border: 2px solid #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #ff6b8f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff85a2;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Auth Form Styles - copied from homepage for consistency */
+        .auth-form-container {
+            background-color: #fef3c7; /* Light yellow for status/form */
+            border: 2px solid #fcd34d; /* Yellow border */
+            color: #92400e; /* Darker yellow text */
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 1.5rem; /* Space below profile content */
+        }
+        .auth-form-container input {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #fcd34d;
+            margin-bottom: 0.75rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .auth-form-container button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .auth-form-container .btn-auth-primary {
+            background-color: #6366f1; /* Indigo */
+            color: white;
+        }
+        .auth-form-container .btn-auth-primary:hover {
+            background-color: #4f46e5;
+        }
+        .auth-form-container .btn-auth-secondary {
+            background-color: #fcd34d; /* Yellow */
+            color: #92400e;
+        }
+        .auth-form-container .btn-auth-secondary:hover {
+            background-color: #fbbf24;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-600">
+    <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
+                    👤 My Profile 💖
+                </h1>
+                <p class="text-xl md:text-2xl text-pink-800 font-semibold">
+                    Your personal space in Lucy and Lala's world! ✨
+                </p>
+            </div>
+        </header>
+
+        <!-- Profile Content Section -->
+        <main class="w-full container mx-auto">
+            <section class="profile-section">
+                <div id="profile-content">
+                    <div class="loading-spinner"></div>
+                    <p class="text-lg text-gray-700 mt-4">Loading your profile...</p>
+                </div>
+                
+                <!-- Authentication Forms (hidden by default, shown if not signed in) -->
+                <div id="auth-form-container" class="auth-form-container hidden">
+                    <form id="login-form" class="space-y-4">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Login to Your Account</h3>
+                        <input type="email" id="login-email" placeholder="Email" required class="block">
+                        <input type="password" id="login-password" placeholder="Password" required class="block">
+                        <button type="submit" class="btn-auth-primary w-full">Login</button>
+                        <p class="text-sm">
+                            Don't have an account? <a href="#" id="show-signup" class="text-indigo-600 hover:underline">Sign Up</a>
+                        </p>
+                        <p class="text-sm">
+                            <a href="#" id="show-forgot-password" class="text-indigo-600 hover:underline">Forgot Password?</a>
+                        </p>
+                    </form>
+
+                    <form id="signup-form" class="space-y-4 hidden">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Create New Account</h3>
+                        <input type="email" id="signup-email" placeholder="Email" required class="block">
+                        <input type="password" id="signup-password" placeholder="Password" required class="block">
+                        <button type="submit" class="btn-auth-primary w-full">Sign Up</button>
+                        <p class="text-sm">
+                            Already have an account? <a href="#" id="show-login" class="text-indigo-600 hover:underline">Login</a>
+                        </p>
+                    </form>
+
+                    <form id="forgot-password-form" class="space-y-4 hidden">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Reset Password</h3>
+                        <input type="email" id="reset-email" placeholder="Enter your email" required class="block">
+                        <button type="submit" class="btn-auth-primary w-full">Send Reset Email</button>
+                        <p class="text-sm">
+                            <a href="#" id="back-to-login" class="text-indigo-600 hover:underline">Back to Login</a>
+                        </p>
+                    </form>
+                    <p id="auth-error-message" class="text-red-600 text-sm mt-2"></p>
+                </div>
+            </section>
+
+            <div class="text-center mt-8">
+                <a href="index.html" class="btn-primary">Back to All Adventures! 🎀</a>
+            </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="w-full container mx-auto text-center mt-12 py-8 border-t-4 border-pink-300 rounded-t-3xl bg-white shadow-inner">
+            <p class="text-gray-600 text-lg font-bold">
+                &copy; 2025 Lucy and Lala's Adventures. All rights reserved. Made with extra love and sprinkles! ❤️✨
+            </p>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase config and app ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app;
+        let auth;
+        let db;
+
+        const profileContentDiv = document.getElementById('profile-content');
+        const authFormContainer = document.getElementById('auth-form-container');
+        const authErrorMessage = document.getElementById('auth-error-message');
+
+        // Forms and their toggles
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
+        const showSignupLink = document.getElementById('show-signup');
+        const showLoginLink = document.getElementById('show-login');
+        const showForgotPasswordLink = document.getElementById('show-forgot-password');
+        const backToLoginLink = document.getElementById('back-to-login');
+
+        // Input fields
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        const signupEmailInput = document.getElementById('signup-email');
+        const signupPasswordInput = document.getElementById('signup-password');
+        const resetEmailInput = document.getElementById('reset-email');
+
+        // Flag to track if Firebase is successfully initialized
+        let firebaseInitialized = false;
+
+        // Initialize Firebase services only if config is available and has an API key
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            firebaseInitialized = true;
+            console.log("Firebase services initialized.");
+        } else {
+            console.error("Firebase config not found or invalid. Profile features will not be available.");
+            profileContentDiv.innerHTML = '<p class="text-red-500">Error: Firebase not configured. Please ensure __firebase_config is set.</p>';
+            authFormContainer.classList.remove('hidden'); // Ensure forms are visible if Firebase fails
+            showForm(loginForm); // Show login form by default
+        }
+
+        // --- Helper Functions for UI Toggling ---
+        function showForm(formToShow) {
+            loginForm.classList.add('hidden');
+            signupForm.classList.add('hidden');
+            forgotPasswordForm.classList.add('hidden');
+            authErrorMessage.textContent = ''; // Clear previous errors
+            formToShow.classList.remove('hidden');
+        }
+
+        if (firebaseInitialized) { // Only add event listeners if Firebase is initialized
+            showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
+            showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+            showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
+            backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+        }
+
+
+        // --- Firebase Auth Functions ---
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            if (!firebaseInitialized || !auth) return null;
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe();
+                    if (user) {
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @param {string} userId The UID of the user.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus(userId) {
+            if (!firebaseInitialized || !db) return false;
+            try {
+                const subscriptionDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(subscriptionDocRef);
+                return docSnap.exists() && docSnap.data().isProSubscriber === true;
+            } catch (error) {
+                console.error("Error fetching subscription status:", error);
+                return false;
+            }
+        }
+
+        /**
+         * Fetches a user's total likes from Firestore.
+         * (Conceptual - requires likes to be stored in Firestore, e.g., in a userStats document)
+         * @param {string} userId The UID of the user.
+         * @returns {Promise<number>} The total number of likes given by the user.
+         */
+        async function getTotalLikes(userId) {
+            if (!firebaseInitialized || !db) return 0;
+            try {
+                // This is a placeholder. In a real app, you'd have a mechanism
+                // to store and aggregate likes per user.
+                // Example: doc(db, `artifacts/${appId}/users/${userId}/stats`, 'likes');
+                // const statsSnap = await getDoc(userStatsRef);
+                // return statsSnap.exists() ? (statsSnap.data().count || 0) : 0;
+                return Math.floor(Math.random() * 100); // For demo, return a random number
+            } catch (error) {
+                console.error("Error fetching total likes:", error);
+                return 0;
+            }
+        }
+
+        // Function to render profile content
+        async function renderProfile(user) {
+            const userId = user.uid;
+            const userEmail = user.email || (user.isAnonymous ? "Anonymous User" : "N/A"); // Handle anonymous email
+
+            const planType = await getProSubscriberStatus(userId);
+            const totalLikes = await getTotalLikes(userId);
+
+            profileContentDiv.innerHTML = `
+                <h3 class="text-3xl font-extrabold text-cutesy-pink mb-4">Hello, ${userEmail}!</h3>
+                <p class="text-lg text-gray-700 mb-2">Your User ID: <span class="font-bold">${userId}</span></p>
+                <p class="text-lg text-gray-700 mb-2">Your Plan: <span class="font-bold text-pink-600">${planType ? "Pro Subscriber Plan 🎉" : "Free Plan"}</span></p>
+                <p class="text-lg text-gray-700 mb-4">Total Likes Given: <span class="font-bold">${totalLikes} ❤️</span></p>
+                <button id="sign-out-button" class="btn-primary mt-4">Sign Out</button>
+                <p class="text-md text-gray-600 mt-4">Thank you for being part of Lucy and Lala's adventures!</p>
+            `;
+
+            // Attach sign out listener
+            document.getElementById('sign-out-button').addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    alert('You have been signed out.'); // Replace with custom modal
+                } catch (error) {
+                    console.error("Error signing out:", error);
+                    authErrorMessage.textContent = error.message; // Display error in auth form
+                }
+            });
+        }
+
+        // --- Event Listeners for Forms (only if Firebase is initialized) ---
+        if (firebaseInitialized) {
+            // Login
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = loginEmailInput.value;
+                const password = loginPasswordInput.value;
+                authErrorMessage.textContent = '';
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    // onAuthStateChanged will handle UI update
+                } catch (error) {
+                    console.error("Login error:", error);
+                    authErrorMessage.textContent = error.message;
+                }
+            });
+
+            // Sign Up
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = signupEmailInput.value;
+                const password = signupPasswordInput.value;
+                authErrorMessage.textContent = '';
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    // onAuthStateChanged will handle UI update
+                } catch (error) {
+                    console.error("Sign up error:", error);
+                    authErrorMessage.textContent = error.message;
+                }
+            });
+
+            // Forgot Password
+            forgotPasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = resetEmailInput.value;
+                authErrorMessage.textContent = '';
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert('Password reset email sent! Check your inbox.'); // Replace with custom modal
+                    showForm(loginForm); // Go back to login form
+                } catch (error) {
+                    console.error("Password reset error:", error);
+                    authErrorMessage.textContent = error.message;
+                }
+            });
+        }
+
+
+        // --- Initial Auth State Check ---
+        if (firebaseInitialized) { // Only run auth check if Firebase is initialized
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    authFormContainer.classList.add('hidden'); // Hide forms
+                    profileContentDiv.innerHTML = `<div class="loading-spinner"></div><p class="text-lg text-gray-700 mt-4">Loading your profile...</p>`; // Show loading
+                    await renderProfile(user);
+                } else {
+                    profileContentDiv.innerHTML = ''; // Clear loading
+                    authFormContainer.classList.remove('hidden'); // Show forms
+                    showForm(loginForm); // Show login form by default
+                    // Attempt anonymous sign-in if not already authenticated
+                    if (initialAuthToken) {
+                        signInWithCustomToken(auth, initialAuthToken)
+                            .then(userCredential => console.log("Signed in with custom token:", userCredential.user.uid))
+                            .catch(e => {
+                                console.error("Error signing in with custom token:", e);
+                                signInAnonymously(auth)
+                                    .then(() => console.log("Signed in anonymously (fallback)."))
+                                    .catch(e => console.error("Error signing in anonymously (fallback):", e));
+                            });
+                    } else {
+                         signInAnonymously(auth)
+                            .then(() => console.log("Signed in anonymously."))
+                            .catch(e => console.error("Error signing in anonymously:", e));
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
