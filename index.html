@@ -189,7 +189,10 @@
             <div id="auth-status" class="p-4 hidden">
                 <p class="font-semibold text-lg" id="auth-message"></p>
                 <p class="text-sm" id="user-id"></p>
-                <button id="sign-out-button" class="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors">Sign Out</button>
+                <div class="flex justify-center items-center gap-4 mt-4">
+                    <a href="user-profile-page.html" class="btn-primary py-2 px-4">My Profile 🧑‍💻</a>
+                    <button id="sign-out-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors">Sign Out</button>
+                </div>
             </div>
 
             <!-- auth-form-container is now visible by default -->
@@ -452,7 +455,7 @@
         <!-- Footer Section -->
         <footer class="w-full container mx-auto text-center mt-16 py-10 border-t-4 border-pink-300 rounded-t-3xl bg-white shadow-inner">
             <p class="text-gray-600 text-lg font-bold">
-                &copy; 2025 Lucy and Lala's Adventures. All rights reserved. Made with extra love and sprinkles! ❤️✨
+                &copy; 2025 Lucy and Lala's Adventures. All rights reserved. Made with extra love and sprinkles! AI is used in this blog.Toddlers are AI toddlers ❤️✨
             </p>
         </footer>
     </div>
@@ -470,13 +473,23 @@
 
         // Global variables for Firebase config and app ID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app = null;
+        let auth = null;
+        let db = null;
+
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } else {
+            console.warn("Firebase config not found or invalid. Authentication and Pro status will not be available.");
+            // Hide auth UI if Firebase is not configured
+            document.getElementById('auth-container').classList.add('hidden');
+        }
 
         let currentUserId = null;
 
@@ -514,10 +527,12 @@
             formToShow.classList.remove('hidden');
         }
 
-        showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
-        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
-        showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
-        backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+        if (auth) { // Only add event listeners if auth is initialized
+            showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
+            showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+            showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
+            backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+        }
 
         // --- Firebase Auth Functions ---
 
@@ -526,15 +541,12 @@
          * @returns {Promise<string|null>} The user's UID or null if not authenticated.
          */
         async function getAuthenticatedUserId() {
+            if (!auth) return null; // Ensure auth is initialized
             return new Promise(resolve => {
                 const unsubscribe = onAuthStateChanged(auth, (user) => {
                     unsubscribe(); // Stop listening once we have a user
-                    if (user) {
-                        currentUserId = user.uid;
-                        resolve(user.uid);
-                    } else {
-                        resolve(null);
-                    }
+                    currentUserId = user ? user.uid : null;
+                    resolve(currentUserId);
                 });
             });
         }
@@ -544,6 +556,7 @@
          * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
          */
         async function getProSubscriberStatus() {
+            if (!db) return false; // Ensure db is initialized
             const userId = await getAuthenticatedUserId();
 
             if (!userId) {
@@ -579,7 +592,7 @@
                 authStatusDiv.classList.add('hidden'); // Hide status
                 authFormContainer.classList.remove('hidden'); // Show forms
                 showForm(loginForm); // Show login form by default
-                authMessage.textContent = 'Not signed in.';
+                authMessage.textContent = ''; // Clear previous messages
                 userIdDisplay.textContent = '';
             }
         }
@@ -606,101 +619,105 @@
         }
 
         // --- Event Listeners for Forms ---
-
-        // Login
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = loginEmailInput.value;
-            const password = loginPasswordInput.value;
-            authErrorMessage.textContent = '';
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                alert('Successfully logged in!'); // Replace with custom modal
-            } catch (error) {
-                console.error("Login error:", error);
-                authErrorMessage.textContent = error.message;
-            }
-        });
-
-        // Sign Up
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = signupEmailInput.value;
-            const password = signupPasswordInput.value;
-            authErrorMessage.textContent = '';
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                alert('Account created successfully! You are now logged in.'); // Replace with custom modal
-            } catch (error) {
-                console.error("Sign up error:", error);
-                authErrorMessage.textContent = error.message;
-            }
-        });
-
-        // Forgot Password
-        forgotPasswordForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = resetEmailInput.value;
-            authErrorMessage.textContent = '';
-            try {
-                await sendPasswordResetEmail(auth, email);
-                alert('Password reset email sent! Check your inbox.'); // Replace with custom modal
-                showForm(loginForm); // Go back to login form
-            } catch (error) {
-                console.error("Password reset error:", error);
-                authErrorMessage.textContent = error.message;
-            }
-        });
-
-        // Sign Out
-        signOutButton.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                alert('You have been signed out.');
-            } catch (error) {
-                console.error("Error signing out:", error);
-                alert('Error signing out. Please try again.');
-            }
-        });
-
-        // Handle clicks on article links (now checks Firestore status)
-        document.querySelectorAll('.articles-list a').forEach(link => {
-            link.addEventListener('click', async function(event) {
-                const isProArticle = this.dataset.pro === 'true';
-                const isUserPro = await getProSubscriberStatus(); // Check live Firestore status
-
-                if (isProArticle && !isUserPro) {
-                    event.preventDefault(); // Stop navigation
-                    alert('This content is for Pro Subscribers only! Please subscribe to unlock.'); // Custom modal would be better
-                    window.open('https://buy.stripe.com/eVq00ldtC8408cxfZwabK00', '_blank'); // Redirect to Stripe
+        if (auth) { // Only add event listeners if auth is initialized
+            // Login
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = loginEmailInput.value;
+                const password = loginPasswordInput.value;
+                authErrorMessage.textContent = '';
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    alert('Successfully logged in!'); // Replace with custom modal
+                } catch (error) {
+                    console.error("Login error:", error);
+                    authErrorMessage.textContent = error.message;
                 }
             });
-        });
 
-        // Initial Auth State Check and Anonymous/Custom Token Sign-in
-        onAuthStateChanged(auth, (user) => {
-            updateAuthUI(user);
-            if (!user) {
-                // If no user is signed in, attempt anonymous or custom token sign-in
-                if (initialAuthToken) {
-                    signInWithCustomToken(auth, initialAuthToken)
-                        .then((userCredential) => {
-                            console.log("Signed in with custom token:", userCredential.user.uid);
-                            // updateAuthUI will be called again by onAuthStateChanged listener
-                        })
-                        .catch((error) => {
-                            console.error("Error signing in with custom token:", error);
-                            signInAnonymously(auth)
-                                .then(() => console.log("Signed in anonymously (fallback)."))
-                                .catch(e => console.error("Error signing in anonymously:", e));
-                        });
-                } else {
-                    signInAnonymously(auth)
-                        .then(() => console.log("Signed in anonymously."))
-                        .catch(e => console.error("Error signing in anonymously:", e));
+            // Sign Up
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = signupEmailInput.value;
+                const password = signupPasswordInput.value;
+                authErrorMessage.textContent = '';
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    alert('Account created successfully! You are now logged in.'); // Replace with custom modal
+                } catch (error) {
+                    console.error("Sign up error:", error);
+                    authErrorMessage.textContent = error.message;
                 }
-            }
-        });
+            });
+
+            // Forgot Password
+            forgotPasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = resetEmailInput.value;
+                authErrorMessage.textContent = '';
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert('Password reset email sent! Check your inbox.'); // Replace with custom modal
+                    showForm(loginForm); // Go back to login form
+                } catch (error) {
+                    console.error("Password reset error:", error);
+                    authErrorMessage.textContent = error.message;
+                }
+            });
+
+            // Sign Out
+            signOutButton.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    alert('You have been signed out.');
+                } catch (error) {
+                    console.error("Error signing out:", error);
+                    alert('Error signing out. Please try again.');
+                }
+            });
+
+            // Handle clicks on article links (now checks Firestore status)
+            document.querySelectorAll('.articles-list a').forEach(link => {
+                link.addEventListener('click', async function(event) {
+                    const isProArticle = this.dataset.pro === 'true';
+                    const isUserPro = await getProSubscriberStatus(); // Check live Firestore status
+
+                    if (isProArticle && !isUserPro) {
+                        event.preventDefault(); // Stop navigation
+                        alert('This content is for Pro Subscribers only! Please subscribe to unlock.'); // Custom modal would be better
+                        window.open('https://buy.stripe.com/eVq00ldtC8408cxfZwabK00', '_blank'); // Redirect to Stripe
+                    }
+                });
+            });
+
+            // Initial Auth State Check and Anonymous/Custom Token Sign-in
+            onAuthStateChanged(auth, (user) => {
+                updateAuthUI(user);
+                if (!user) {
+                    // If no user is signed in, attempt anonymous or custom token sign-in
+                    if (initialAuthToken) {
+                        signInWithCustomToken(auth, initialAuthToken)
+                            .then((userCredential) => {
+                                console.log("Signed in with custom token:", userCredential.user.uid);
+                                // updateAuthUI will be called again by onAuthStateChanged listener
+                            })
+                            .catch((error) => {
+                                console.error("Error signing in with custom token:", error);
+                                signInAnonymously(auth)
+                                    .then(() => console.log("Signed in anonymously (fallback)."))
+                                    .catch(e => console.error("Error signing in anonymously:", e));
+                            });
+                    } else {
+                         signInAnonymously(auth)
+                            .then(() => console.log("Signed in anonymously."))
+                            .catch(e => console.error("Error signing in anonymously:", e));
+                    }
+                }
+            });
+        } else { // If Firebase is not initialized, hide auth forms and display error
+            authContainer.classList.add('hidden');
+            console.error("Authentication features are disabled because Firebase is not configured.");
+        }
     </script>
 </body>
 </html>
