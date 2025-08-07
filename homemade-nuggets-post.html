@@ -169,6 +169,7 @@
     </style>
 </head>
 <body class="antialiased text-gray-600">
+  <body class="antialiased text-gray-600">
     <!-- Content Lock Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -177,21 +178,31 @@
 
         // Global variables for Firebase config and app ID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app = null;
+        let auth = null;
+        let db = null;
+        let currentUserId = null;
 
-        let currentUserId = null; // To store the authenticated user's UID
+        // Initialize Firebase services only if config is available
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase services initialized.");
+        } else {
+            console.warn("Firebase config not found. Authentication and Pro status will not be available.");
+        }
+        
 
         /**
          * Gets the current authenticated user's UID.
          * @returns {Promise<string|null>} The user's UID or null if not authenticated.
          */
         async function getAuthenticatedUserId() {
+            if (!auth) return null;
             return new Promise(resolve => {
                 const unsubscribe = onAuthStateChanged(auth, (user) => {
                     unsubscribe(); // Stop listening once we have a user
@@ -210,6 +221,7 @@
          * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
          */
         async function getProSubscriberStatus() {
+            if (!db) return false;
             const userId = await getAuthenticatedUserId();
 
             if (!userId) {
@@ -233,28 +245,47 @@
             }
         }
 
-        const releaseDate = new Date('2025-08-16T00:00:00'); // Set release date to August 16th, 2025
+        const releaseDate = new Date('2025-08-16T00:00:00'); // Set release date to August 16st, 2025
         const currentDate = new Date();
 
         document.addEventListener('DOMContentLoaded', async () => {
             // Ensure Firebase Auth is ready before checking status
-            await new Promise(resolve => {
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUserId = user.uid;
-                    }
-                    resolve();
+            if (auth) {
+                 await new Promise(resolve => {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            currentUserId = user.uid;
+                        } else {
+                             // If no user is signed in, attempt anonymous or custom token sign-in
+                            if (initialAuthToken) {
+                                signInWithCustomToken(auth, initialAuthToken)
+                                    .then((userCredential) => {
+                                        console.log("Signed in with custom token:", userCredential.user.uid);
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error signing in with custom token:", error);
+                                        signInAnonymously(auth)
+                                            .then(() => console.log("Signed in anonymously (fallback)."))
+                                            .catch(e => console.error("Error signing in anonymously:", e));
+                                    });
+                            } else {
+                                signInAnonymously(auth)
+                                    .then(() => console.log("Signed in anonymously."))
+                                    .catch(e => console.error("Error signing in anonymously:", e));
+                            }
+                        }
+                        resolve();
+                    });
                 });
-            });
-
-            if (currentDate < releaseDate) {
+            }
+if (currentDate < releaseDate) {
                 // Article is date-locked for everyone
                 document.body.innerHTML = `
                     <div class="locked-overlay">
                         <h3>🔒 Coming Soon!</h3>
-                        <p>This exclusive cooking adventure will be released on August 16th, 2025!</p>
-                        <p>Check back soon to see how the girls became little chefs!</p>
-                        <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                        <p>This delightful adventure will be released on August 16st, 2025!</p>
+                        <p>Check back soon to see Lucy and Lala's Hello Kitty fun!</p>
+                        <a href="index.html" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
                             Back to All Adventures! 🎀
                         </a>
                     </div>
@@ -267,20 +298,22 @@
                     const mainContent = document.querySelector('main');
                     if (mainContent) {
                         mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                        
+                        // We will lock the entire main content area
                         mainContent.innerHTML = `
                             <div class="pro-content-overlay">
                                 <h3>🔒 Pro Content Only!</h3>
-                                <p>This exclusive cooking adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                                <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
                                 <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
                             </div>
                             ${mainContent.innerHTML}
                         `;
-                        // Optionally blur or reduce opacity of content behind overlay
-                        const contentToBlur = mainContent.querySelector('article');
-                        if (contentToBlur) {
-                            contentToBlur.style.filter = 'blur(5px)';
-                            contentToBlur.style.pointerEvents = 'none';
-                        }
+                        // Blur the content behind the overlay
+                        const sectionsToBlur = mainContent.querySelectorAll('section');
+                        sectionsToBlur.forEach(section => {
+                            section.style.filter = 'blur(5px)';
+                            section.style.pointerEvents = 'none';
+                        });
                     }
                 }
             }
