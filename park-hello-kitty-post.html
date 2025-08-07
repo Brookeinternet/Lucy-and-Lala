@@ -130,7 +130,7 @@
     </style>
 
     
-</head>
+/head>
 <body class="antialiased text-gray-600">
     <!-- Content Lock Script -->
     <script type="module">
@@ -240,9 +240,7 @@
                     });
                 });
             }
-
-
-            if (currentDate < releaseDate) {
+if (currentDate < releaseDate) {
                 // Article is date-locked for everyone
                 document.body.innerHTML = `
                     <div class="locked-overlay">
@@ -262,6 +260,8 @@
                     const mainContent = document.querySelector('main');
                     if (mainContent) {
                         mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                        
+                        // We will lock the entire main content area
                         mainContent.innerHTML = `
                             <div class="pro-content-overlay">
                                 <h3>🔒 Pro Content Only!</h3>
@@ -270,16 +270,84 @@
                             </div>
                             ${mainContent.innerHTML}
                         `;
-                        // Optionally blur or reduce opacity of content behind overlay
-                        const contentToBlur = mainContent.querySelector('section');
-                        if (contentToBlur) {
-                            contentToBlur.style.filter = 'blur(5px)';
-                            contentToBlur.style.pointerEvents = 'none';
-                        }
+                        // Blur the content behind the overlay
+                        const sectionsToBlur = mainContent.querySelectorAll('section');
+                        sectionsToBlur.forEach(section => {
+                            section.style.filter = 'blur(5px)';
+                            section.style.pointerEvents = 'none';
+                        });
                     }
                 }
             }
         });
+    </script>
+
+    <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
+                    🌸 Park Play & Hello Kitty Charm! 🎀
+                </h1>
+                <p class="text-xl md:text-2xl text-pink-800 font-semibold">
+                    A delightful day out with Lucy and Lala! ✨
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Blog Post Content -->
+        <main class="w-full container mx-auto">
+            <!-- Section 1: Park Fun & Hello Kitty Dresses -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/C2BDyp6.jpeg" alt="Lucy and Lala at the park in Hello Kitty dresses">
+                </div>
+                <div class="p-8 text-center">
+                    <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">Sunshine, Smiles & Hello Kitty Style! ☀️🐱</h2>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        What a beautiful day for a park adventure with Lucy and Lala! The sun was shining, the grass was green, and their smiles were absolutely radiant. They were perfectly dressed for a day of outdoor fun in their adorable matching **Hello Kitty dresses from <a href="https://www2.hm.com/en_us/productpage.1154543023.html" target="_blank" class="text-pink-600 font-bold hover:underline">H&M</a>**!
+                        <br><br>
+                        These sleeveless, light pink dresses are covered in cheerful white Hello Kitty faces and tiny red heart accents💖, making them incredibly sweet and playful. The soft, breathable fabric is ideal for warm weather, allowing them to run, jump🤸‍♀️, and play comfortably without a care in the world. Their little red bows🎀 in their hair perfectly complement the dresses, adding an extra touch of cuteness. If you love this style, H&M also offers a cute <a href="https://www2.hm.com/en_us/productpage.1300354001.html" target="_blank" class="text-pink-600 font-bold hover:underline">2-Piece Set with Top and Leggings - White/Hello Kitty</a> that's perfect for cozy days! For even more character-themed fun, explore H&M's full range of <a href="https://www2.hm.com/en_us/kids/seasonal-trending/character.html" target="_blank" class="text-pink-600 font-bold hover:underline">character clothes and accessories for kids</a>! It's moments like these, filled with fresh air, laughter, and their favorite characters, that make childhood so magical!✨
+                    </p>
+                    <div class="flex justify-center items-center space-x-6 mt-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <button class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Find Their Style! 👗
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Playtime with Cute Toys -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/VLsZ4oS.jpeg" alt="Lucy and Lala holding cute toys at the park">
+                </div>
+                <div class="p-8 text-center">
+                    <h3 class="text-4xl font-extrabold text-cutesy-pink mb-4">Playful Pals in the Park! 💚💗</h3>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        No park trip is complete without some favorite toys! Lucy is proudly holding a vibrant green toy, but what makes this moment truly special is that it's her very own **homemade Labubu doll**! This unique, handcrafted doll, with its distinctive features, is a testament to her creativity and a truly special companion. It's wonderful to see her cherishing something made with so much love and imagination.
+                        <br><br>
+                        Lala, equally delighted, has a charming pink toy in her hands, also a unique creation, possibly another homemade Labubu doll or a similar whimsical figure. These dolls, with their bright colors and playful designs, are perfect companions for outdoor adventures, sparking imagination and encouraging interactive play. The girls' joyful expressions show just how much they cherish their little pals, bringing their own unique characters to life right there in the sunshine!☀️
+                        <br><br>
+                        For those inspired to create their own unique dolls or find adorable outfits for them, you can explore a wonderful selection of <a href="https://www.etsy.com/listing/4338031082/handmade-labubu-doll-clothes-fits-v1-v2?ls=a&ref=sold_out_ad-5&pro=1&frs=1&plkey=27441fcbffbe662613b269e7e4a923c64a92b3f1%3A4338031082" target="_blank" class="text-pink-600 font-bold hover:underline">handmade Labubu doll clothes on Etsy</a>, perfect for customizing your own beloved figures and adding even more personality to their playtime adventures! You can also find more official Labubu dolls and merchandise at the <a href="https://labubudollstore.com/collections/labubu-doll" target="_blank" class="text-pink-600 font-bold hover:underline">Labubu Doll Store</a>.
+                    </p>
+                    <div class="flex justify-center items-center space-x-6 mt-6">
+                        <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                        <button class="btn-primary py-3 px-6 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                            Discover More Toys! 🎁
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="text-center mt-12">
+                <a href="index.html" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl">
+                    Back to All Adventures! 🎀
+                </a>
+            </div>
+        </main>
+
     </script>
 
     <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
