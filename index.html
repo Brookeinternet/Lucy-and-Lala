@@ -589,7 +589,7 @@
                 userIdDisplay.textContent = `User ID: ${user.uid}`;
                 await updateProStatusUI(); // Update Pro status display after user is known
             } else {
-                authStatusDiv.classList.add('hidden'); // Hide status
+                  authStatusDiv.classList.add('hidden'); // Hide status
                 authFormContainer.classList.remove('hidden'); // Show forms
                 showForm(loginForm); // Show login form by default
                 authMessage.textContent = ''; // Clear previous messages
