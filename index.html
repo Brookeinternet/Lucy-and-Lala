@@ -714,9 +714,12 @@
                     }
                 }
             });
-        } else { // If Firebase is not initialized, hide auth forms and display error
-            authContainer.classList.add('hidden');
-            console.error("Authentication features are disabled because Firebase is not configured.");
+        } else { // If auth is not initialized
+            // Handle cases where Firebase is not available
+            document.getElementById('auth-status').classList.add('hidden');
+            authFormContainer.classList.remove('hidden');
+            showForm(loginForm);
+            authErrorMessage.textContent = 'Authentication is not available. Please try again later.';
         }
     </script>
 </body>
