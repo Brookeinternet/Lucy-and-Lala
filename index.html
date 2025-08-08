@@ -503,23 +503,29 @@
 
 
         // Global variables for Firebase config and app ID
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+       const firebaseConfig = {
+    apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+    authDomain: "lucyandlala.firebaseapp.com",
+    projectId: "lucyandlala",
+    storageBucket: "lucyandlala.firebasestorage.app",
+    messagingSenderId: "422161772278",
+    appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+    measurementId: "G-JZJK3JWCKH"
+};
 
         // Initialize Firebase
         let app = null;
         let auth = null;
         let db = null;
+        let authInitialized = false;
 
         if (firebaseConfig && firebaseConfig.apiKey) {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            authInitialized = true;
         } else {
-            console.warn("Firebase config not found or invalid. Authentication and Pro status will not be available.");
-            // Hide auth UI if Firebase is not configured
-            document.getElementById('auth-container').classList.add('hidden');
+            console.warn("Firebase config not found or invalid. Authentication features will not be available.");
         }
 
         let currentUserId = null;
@@ -554,57 +560,22 @@
             if (loginForm) loginForm.classList.add('hidden');
             if (signupForm) signupForm.classList.add('hidden');
             if (forgotPasswordForm) forgotPasswordForm.classList.add('hidden');
-            if (authErrorMessage) authErrorMessage.textContent = ''; // Clear previous errors
+            if (authErrorMessage) authErrorMessage.textContent = '';
             if (formToShow) formToShow.classList.remove('hidden');
         }
 
-        if (auth) { // Only add event listeners if auth is initialized
-            if (showSignupLink) showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
-            if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
-            if (showForgotPasswordLink) showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
-            if (backToLoginLink) backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
-        }
-
         // --- Firebase Auth Functions ---
-
-        /**
-         * Gets the current authenticated user's UID.
-         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
-         */
-        async function getAuthenticatedUserId() {
-            if (!auth) return null; // Ensure auth is initialized
-            return new Promise(resolve => {
-                const unsubscribe = onAuthStateChanged(auth, (user) => {
-                    unsubscribe(); // Stop listening once we have a user
-                    currentUserId = user ? user.uid : null;
-                    resolve(currentUserId);
-                });
-            });
-        }
 
         /**
          * Fetches a user's subscriber status from Firestore.
          * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
          */
         async function getProSubscriberStatus() {
-            if (!db) return false; // Ensure db is initialized
-            const userId = await getAuthenticatedUserId();
-
-            if (!userId) {
-                console.warn("Cannot get subscriber status: User not authenticated.");
-                return false;
-            }
-
+            if (!authInitialized || !db || !currentUserId) return false;
             try {
-                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const userDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/profile`, 'subscription');
                 const docSnap = await getDoc(userDocRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    return data.isProSubscriber === true;
-                } else {
-                    return false;
-                }
+                return docSnap.exists() && docSnap.data().isProSubscriber === true;
             } catch (error) {
                 console.error("Error fetching subscriber status:", error);
                 return false;
@@ -614,27 +585,25 @@
         // Function to update UI based on auth state
         async function updateAuthUI(user) {
             if (user) {
-                authContainer.classList.add('hidden'); // Hide the entire auth container when signed in
-            } else {
-                authContainer.classList.remove('hidden'); // Show the container when signed out
-            }
-            authStatusDiv.classList.toggle('hidden', !user); // Show status div if user exists
-            authFormContainer.classList.toggle('hidden', !!user); // Show form container if user does NOT exist
-
-            if (user) {
+                authFormContainer.classList.add('hidden'); // Hide forms
+                authStatusDiv.classList.remove('hidden'); // Show status
                 authMessage.textContent = 'You are signed in!';
                 userIdDisplay.textContent = `User ID: ${user.uid}`;
-                await updateProStatusUI(); // Update Pro status display after user is known
+                await updateProStatusUI();
             } else {
+                authStatusDiv.classList.add('hidden'); // Hide status
+                authFormContainer.classList.remove('hidden'); // Show forms
+                showForm(loginForm); // Show login form by default
                 authMessage.textContent = ''; // Clear previous messages
                 userIdDisplay.textContent = '';
-                showForm(loginForm); // Show login form by default
             }
+            // Once auth state is determined, hide the loading overlay
+            document.getElementById('loading-overlay').classList.add('hidden');
         }
 
         // Function to update Pro Status UI (reads from Firestore)
         async function updateProStatusUI() {
-            const isProSubscriber = await getProSubscriberStatus(); // Get status from Firestore
+            const isProSubscriber = await getProSubscriberStatus();
             const articleLinks = document.querySelectorAll('.articles-list a');
             articleLinks.forEach(link => {
                 let proBadge = link.querySelector('.pro-badge');
@@ -654,8 +623,12 @@
         }
 
         // --- Event Listeners for Forms ---
-        if (auth) { // Only add event listeners if auth is initialized
-            // Login
+        if (authInitialized) {
+            if (showSignupLink) showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
+            if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+            if (showForgotPasswordLink) showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
+            if (backToLoginLink) backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = loginEmailInput.value;
@@ -663,14 +636,13 @@
                 if (authErrorMessage) authErrorMessage.textContent = '';
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
-                    alert('Successfully logged in!'); // Replace with custom modal
+                    alert('Successfully logged in!');
                 } catch (error) {
                     console.error("Login error:", error);
                     if (authErrorMessage) authErrorMessage.textContent = error.message;
                 }
             });
 
-            // Sign Up
             signupForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = signupEmailInput.value;
@@ -678,29 +650,27 @@
                 if (authErrorMessage) authErrorMessage.textContent = '';
                 try {
                     await createUserWithEmailAndPassword(auth, email, password);
-                    alert('Account created successfully! You are now logged in.'); // Replace with custom modal
+                    alert('Account created successfully! You are now logged in.');
                 } catch (error) {
                     console.error("Sign up error:", error);
                     if (authErrorMessage) authErrorMessage.textContent = error.message;
                 }
             });
 
-            // Forgot Password
             forgotPasswordForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = resetEmailInput.value;
                 if (authErrorMessage) authErrorMessage.textContent = '';
                 try {
                     await sendPasswordResetEmail(auth, email);
-                    alert('Password reset email sent! Check your inbox.'); // Replace with custom modal
-                    showForm(loginForm); // Go back to login form
+                    alert('Password reset email sent! Check your inbox.');
+                    showForm(loginForm);
                 } catch (error) {
                     console.error("Password reset error:", error);
                     if (authErrorMessage) authErrorMessage.textContent = error.message;
                 }
             });
 
-            // Sign Out
             if (signOutButton) signOutButton.addEventListener('click', async () => {
                 try {
                     await signOut(auth);
@@ -711,50 +681,23 @@
                 }
             });
 
-            // Handle clicks on article links (now checks Firestore status)
             document.querySelectorAll('.articles-list a').forEach(link => {
                 link.addEventListener('click', async function(event) {
                     const isProArticle = this.dataset.pro === 'true';
-                    const isUserPro = await getProSubscriberStatus(); // Check live Firestore status
-
+                    const isUserPro = await getProSubscriberStatus();
                     if (isProArticle && !isUserPro) {
-                        event.preventDefault(); // Stop navigation
-                        alert('This content is for Pro Subscribers only! Please subscribe to unlock.'); // Custom modal would be better
-                        window.open('https://buy.stripe.com/eVq00ldtC8408cxfZwabK00', '_blank'); // Redirect to Stripe
+                        event.preventDefault();
+                        alert('This content is for Pro Subscribers only! Please subscribe to unlock.');
+                        window.open('https://buy.stripe.com/eVq00ldtC8408cxfZwabK00', '_blank');
                     }
                 });
             });
 
-            // Initial Auth State Check and Anonymous/Custom Token Sign-in
+            // Initial Auth State Check
             onAuthStateChanged(auth, (user) => {
+                currentUserId = user ? user.uid : null;
                 updateAuthUI(user);
-                if (!user) {
-                    // If no user is signed in, attempt anonymous or custom token sign-in
-                    if (initialAuthToken) {
-                        signInWithCustomToken(auth, initialAuthToken)
-                            .then((userCredential) => {
-                                console.log("Signed in with custom token:", userCredential.user.uid);
-                                // updateAuthUI will be called again by onAuthStateChanged listener
-                            })
-                            .catch((error) => {
-                                console.error("Error signing in with custom token:", error);
-                                signInAnonymously(auth)
-                                    .then(() => console.log("Signed in anonymously (fallback)."))
-                                    .catch(e => console.error("Error signing in anonymously:", e));
-                            });
-                    } else {
-                         signInAnonymously(auth)
-                            .then(() => console.log("Signed in anonymously."))
-                            .catch(e => console.error("Error signing in anonymously:", e));
-                    }
-                }
             });
-        } else { // If auth is not initialized
-            // Handle cases where Firebase is not available
-            document.getElementById('auth-status').classList.add('hidden');
-            authFormContainer.classList.remove('hidden');
-            showForm(loginForm);
-            authErrorMessage.textContent = 'Authentication is not available. Please try again later.';
         }
     </script>
 </body>
