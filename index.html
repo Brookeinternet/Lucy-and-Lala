@@ -189,10 +189,721 @@
             <div id="auth-status" class="p-4 hidden">
                 <p class="font-semibold text-lg" id="auth-message"></p>
                 <p class="text-sm" id="user-id"></p>
-                <div class="flex justify-center items-center gap-4 mt-4">
-                    <a href="user-profile-page.html" class="btn-primary py-2 px-4">My Profile 🧑‍💻</a>
-                    <button id="sign-out-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors">Sign Out</button>
+                 <a href="user-profile-page.html" class="btn-primary py-2 px-4">My Profile 🧑‍💻</a>
+                <button id="sign-out-button" class="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors">Sign Out</button>
+            </div>
+
+            <!-- auth-form-container is now visible by default -->
+            <div id="auth-form-container" class="auth-form-container">
+                <form id="login-form" class="space-y-4">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Login to Your Account</h3>
+                    <input type="email" id="login-email" placeholder="Email" required class="block">
+                    <input type="password" id="login-password" placeholder="Password" required class="block">
+                    <button type="submit" class="btn-auth-primary w-full">Login</button>
+                    <p class="text-sm">
+                        Don't have an account? <a href="#" id="show-signup" class="text-indigo-600 hover:underline">Sign Up</a>
+                    </p>
+                    <p class="text-sm">
+                        <a href="#" id="show-forgot-password" class="text-indigo-600 hover:underline">Forgot Password?</a>
+                    </p>
+                </form>
+
+                <form id="signup-form" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Create New Account</h3>
+                    <input type="email" id="signup-email" placeholder="Email" required class="block">
+                    <input type="password" id="signup-password" placeholder="Password" required class="block">
+                    <button type="submit" class="btn-auth-primary w-full">Sign Up</button>
+                    <p class="text-sm">
+                        Already have an account? <a href="#" id="show-login" class="text-indigo-600 hover:underline">Login</a>
+                    </p>
+                </form>
+
+                <form id="forgot-password-form" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Reset Password</h3>
+                    <input type="email" id="reset-email" placeholder="Enter your email" required class="block">
+                    <button type="submit" class="btn-auth-primary w-full">Send Reset Email</button>
+                    <p class="text-sm">
+                        <a href="#" id="back-to-login" class="text-indigo-600 hover:underline">Back to Login</a>
+                    </p>
+                </form>
+                <p id="auth-error-message" class="text-red-600 text-sm mt-2"></p>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-8 shadow-xl mb-4">
+                <h1 class="text-7xl md:text-8xl font-extrabold text-white mb-4 drop-shadow-lg">
+                    🌈 Lucy and Lala's Playful Adventures 🌟
+                </h1>
+                <p class="text-3xl md:text-4xl text-pink-800 font-bold">
+                    Join us as we explore the wonderful world through the eyes of two curious toddlers! 💖✨
+                </p>
+            </div>
+        </header>
+
+        <!-- Pro Subscriber Callout -->
+        <section class="w-full container mx-auto pro-subscriber-callout">
+            <h2 class="text-4xl font-extrabold mb-3 drop-shadow-sm">Unlock Exclusive Adventures! ✨</h2>
+            <p class="text-xl text-white mb-6">
+                Become a **Lucy and Lala Pro Subscriber** for just **$10 a month** and get access to even more delightful content, behind-the-scenes moments, and special updates!
+            </p>
+            <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank" class="btn-secondary py-4 px-8 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                Become a Pro Subscriber! 🚀
+            </a>
+        </section>
+
+        <!-- Articles List Callout with Thumbnails -->
+        <section class="w-full container mx-auto articles-list-callout">
+            <h2 class="text-4xl font-extrabold mb-3 drop-shadow-sm">Our Latest Adventures! 💖</h2>
+            <p class="text-xl text-white mb-6">
+                Dive into all the fun and heartwarming moments from Lucy and Lala's world!
+            </p>
+            <ul class="articles-list">
+                <li>
+                    <a href="first-steps-giggles-post" target="_blank" data-pro="false">
+                        <img src="https://i.imgur.com/jXcGCKg.png" alt="First Steps and Giggles Thumbnail" class="article-thumbnail">
+                        <span>👣 First Steps and Giggles!</span>
+                        <span class="release-date">Released: July 23</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="happy-meal-carters-post" target="_blank" data-pro="false">
+                        <img src="https://i.imgur.com/WxA5W6K.png" alt="Happy Meal & Adorable Outfits Thumbnail" class="article-thumbnail">
+                        <span>🍔 Happy Meal & Adorable Outfits!</span>
+                        <span class="release-date">Released: July 24</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="target-toys-carters-post" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/L985f9t.png" alt="Target Fun & Toy Treasures Thumbnail" class="article-thumbnail">
+                        <span>🎯 Target Fun & Toy Treasures! <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: July 25</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="park-hello-kitty-post" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/C2BDyp6.jpeg" alt="Park Play & Hello Kitty Charm Thumbnail" class="article-thumbnail">
+                        <span>🌸 Park Play & Hello Kitty Charm! <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: August 1</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="cold-stone-hanna-post" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/nQp6Gat.png" alt="Cold Stone Sweetness & Hanna Andersson Hugs Thumbnail" class="article-thumbnail">
+                        <span>🍦 Cold Stone Sweetness & Hanna Andersson Hugs! <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: August 4</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="pajama-spoon-post" target="_blank" data-pro="false">
+                        <img src="https://i.imgur.com/8HPtiHp.png" alt="Cozy Mornings & Yummy Meals Thumbnail" class="article-thumbnail">
+                        <span>☀️ Cozy Mornings & Yummy Meals!</span>
+                        <span class="release-date">Released: August 10</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="sleepy-morning-pjs-post" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/tKBmitc.jpeg" alt="Sleepy Morning & Cute PJs Thumbnail" class="article-thumbnail">
+                        <span>😴 Sleepy Morning & Cute PJs - Lala's Cozy Start <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: August 16</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="homemade-nuggets-post" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/oZPNSY5.png" alt="Homemade Nuggets & Happy Eaters Thumbnail" class="article-thumbnail">
+                        <span>🍗 Homemade Nuggets & Happy Eaters! <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: August 16</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="lala-coffee-moment-post-with-sweet-roll" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/EqSOEWO.jpeg" alt="Lala's Special Coffee Moment Thumbnail" class="article-thumbnail">
+                        <span>☕ Lala's Special Coffee Moment! <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: August 23</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="childrens-place-post" target="_blank" data-pro="false">
+                        <img src="https://i.imgur.com/yfy42sN.jpeg" alt="The Children's Place Fun Thumbnail" class="article-thumbnail">
+                        <span>🛍️ The Children's Place Fun!</span>
+                        <span class="release-date">Released: August 23</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="earths-best-snacks-post" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/7mMNLsA.jpeg" alt="Elmo Snacks & Happy Smiles Thumbnail" class="article-thumbnail">
+                        <span>🍪 Elmo Snacks & Happy Smiles! <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: August 30</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="pbj-recipe-post" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/mh5ABKR.jpeg" alt="Homemade Organic PB&J Fun Thumbnail" class="article-thumbnail">
+                        <span>🥪 Homemade Organic PB&J Fun! <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: August 30</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="park-day-aqua-jumper-post" target="_blank" data-pro="false">
+                        <img src="https://i.imgur.com/0i8h7CD.jpeg" alt="Twin's Day Out at the Park Thumbnail" class="article-thumbnail">
+                        <span>🌳 Twin's Day Out at the Park!</span>
+                        <span class="release-date">Released: Sept 6</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="cheerios-dolls-breakfast-post" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/tvynYbC.jpeg" alt="Breakfast Buddies & Cheerio Fun Thumbnail" class="article-thumbnail">
+                        <span>🥣 Breakfast Buddies & Cheerio Fun! <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: Sept 13</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="pottery-barn-highchair-post" target="_blank" data-pro="false">
+                        <img src="https://i.imgur.com/gkjXvtB.jpeg" alt="Our Favorite Pink Play Highchair Thumbnail" class="article-thumbnail">
+                        <span>🎀 Our Favorite Pink Play Highchair!</span>
+                        <span class="release-date">Released: Sept 20</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="barnes-noble-book-adventure" target="_blank" data-pro="true">
+                        <img src="https://i.imgur.com/Xe7e1vP.png" alt="Barnes & Noble Book Adventure Thumbnail" class="article-thumbnail">
+                        <span>📚 Barnes & Noble Book Adventure! <span class="pro-badge">PRO</span></span>
+                        <span class="release-date">Released: Sept 27</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="mt-8">
+                <a href="upcoming-articles.html" class="btn-primary py-4 px-8 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                    View All Adventures! 🚀
+                </a>
+            </div>
+        </section>
+
+        <!-- Main Blog Content Area (existing posts) -->
+        <main class="w-full container mx-auto space-y-16">
+            <!-- Blog Post 1 -->
+            <article class="blog-post p-10 rounded-3xl flex flex-col md:flex-row items-center md:items-start gap-10">
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://i.imgur.com/jXcGCKg.png" alt="Lucy and Lala playing together" class="rounded-3xl shadow-2xl w-full max-w-md md:max-w-none object-cover h-auto border-4 border-pink-100">
                 </div>
+                <div class="md:w-1/2 text-center md:text-left">
+                    <h2 class="text-5xl font-extrabold text-cutesy-pink mb-5">First Steps and Giggles 👣</h2>
+                    <p class="text-gray-700 leading-relaxed mb-8 text-xl">
+                        It's been an incredible journey watching Lucy and Lala discover the world around them. From their very first wobbly steps to their infectious giggles, every day is a new adventure. Today, they spent hours exploring the backyard, chasing butterflies (or at least trying to!🦋), and making friends with every leaf they found. Their bond is truly heartwarming to witness. Every little milestone is a cause for celebration in our home, and their joyful sounds fill our days with so much happiness. In this photo, you can see both Lucy and Lala in sweet, **light-colored (likely cream or off-white) long-sleeve tops, adorned with charming scattered red strawberry prints**🍓. These comfy shirts are perfect for all their outdoor explorations, keeping them cozy while they discover the wonders of nature. If you love this print, you can find similar adorable strawberry-themed clothes for toddlers at <a href="https://www.carters.com/search?q=strawberry+toddler+clothes" target="_blank" class="text-pink-600 font-bold hover:underline">Carter's</a>, <a href="https://oldnavy.gap.com/products/toddler-strawberry-clothes.jsp" target="_blank" class="text-pink-600 font-bold hover:underline">Old Navy</a>, or <a href="https://www.hannaandersson.com/search?q=strawberry+pajamas" target="_blank" class="text-pink-600 font-bold hover:underline">Hanna Andersson</a>!
+                    </p>
+                    <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl">
+                        Read More Cuteness! 🎀
+                    </a>
+                </div>
+            </article>
+
+            <!-- Blog Post 2 -->
+            <article class="blog-post p-10 rounded-3xl flex flex-col md:flex-row-reverse items-center md:items-start gap-10">
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://i.imgur.com/Raw8OzJ.png" alt="Lala enjoying a snack" class="rounded-3xl shadow-2xl w-full max-w-md md:max-w-none object-cover h-auto border-4 border-pink-100">
+                </div>
+                <div class="md:w-1/2 text-center md:text-right">
+                    <h2 class="text-5xl font-extrabold text-cutesy-pink mb-5">Snack Time Shenanigans 🍓</h2>
+                    <p class="text-gray-700 leading-relaxed mb-8 text-xl">
+                        Snack time with Lucy and Lala is always an event! Today, Lala was particularly enthusiastic about her fruit puree, resulting in a masterpiece of colorful splatters. Lucy, ever the neat one, tried her best to keep her hands clean, but eventually succumbed to the delicious mess. These moments, though messy, are filled with so much joy and uninhibited delight.
+                    </p>
+                    <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl">
+                        See More Messy Fun! 🎈
+                    </a>
+                </div>
+            </article>
+
+            <!-- Blog Post 3 -->
+            <article class="blog-post p-10 rounded-3xl flex flex-col md:flex-row items-center md:items-start gap-10">
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://i.imgur.com/JqT4TvW.png" alt="Lucy and Lala reading a book" class="rounded-3xl shadow-2xl w-full max-w-md md:max-w-none object-cover h-auto border-4 border-pink-100">
+                </div>
+                <div class="md:w-1/2 text-center md:text-left">
+                    <h2 class="text-5xl font-extrabold text-cutesy-pink mb-5">Story Time Cuddles 📚</h2>
+                    <p class="text-gray-700 leading-relaxed mb-8 text-xl">
+                        There's nothing quite like winding down the day with a good book and two sleepy toddlers. Lucy loves pointing at the pictures, while Lala enjoys turning the pages (sometimes a little too quickly!). These quiet moments of connection, filled with soft murmurs and gentle cuddles, are truly precious and remind us of the simple joys of childhood.
+                    </p>
+                    <a href="#" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl">
+                        Discover More Stories! 🧸
+                    </a>
+                </div>
+            </article>
+        </main>
+
+        <!-- Donation Callout -->
+        <section class="w-full container mx-auto donation-callout">
+            <h2 class="text-4xl font-extrabold mb-3 drop-shadow-sm">Support Lucy & Lala's Adventures! 🍩🥐</h2>
+            <p class="text-xl text-white mb-6">
+                Loved our latest posts? You can help us create even more delightful content by treating Lucy or Lala to a special snack!
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mb-6">
+                <img src="https://i.imgur.com/EqSOEWO.jpeg" alt="Lala with a special drink" class="donation-image w-full sm:w-1/2 md:w-1/3">
+            </div>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="https://buy.stripe.com/eVq6oJdtCckg1O928GabK02" target="_blank" class="btn-secondary py-4 px-8 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                    Give a Donut ($5) 🍩
+                </a>
+                <a href="https://buy.stripe.com/eVq6oJdtCckg1O928GabK02" target="_blank" class="btn-secondary py-4 px-8 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                    Give a Sweet Roll ($5) 🥐
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer Section -->
+        <footer class="w-full container mx-auto text-center mt-16 py-10 border-t-4 border-pink-300 rounded-t-3xl bg-white shadow-inner">
+            <p class="text-gray-600 text-lg font-bold">
+                &copy; 2025 Lucy and Lala's Adventures. All rights reserved. Made with extra love and sprinkles! AI is used in this blog.Toddlers are AI toddlers ❤️✨
+            </p>
+        </footer>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Initialize Stripe.js with your publishable key
+        const stripe = Stripe('pk_live_51Ro7nNReyOAsAwqJH3XMcYCu0yYudEZ4sDCQfUfYLe7ECg4jRslHvnMX5WOIx7c7wfSxkSNwJrBeKnF9KnDyAoXR00eyCtYQGI');
+
+
+        // Global variables for Firebase config and app ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserId = null;
+
+        // Auth UI Elements
+        const authContainer = document.getElementById('auth-container');
+        const authStatusDiv = document.getElementById('auth-status');
+        const authFormContainer = document.getElementById('auth-form-container');
+        const authMessage = document.getElementById('auth-message');
+        const userIdDisplay = document.getElementById('user-id');
+        const signOutButton = document.getElementById('sign-out-button');
+        const authErrorMessage = document.getElementById('auth-error-message');
+
+        // Forms and their toggles
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
+        const showSignupLink = document.getElementById('show-signup');
+        const showLoginLink = document.getElementById('show-login');
+        const showForgotPasswordLink = document.getElementById('show-forgot-password');
+        const backToLoginLink = document.getElementById('back-to-login');
+
+        // Input fields
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        const signupEmailInput = document.getElementById('signup-email');
+        const signupPasswordInput = document.getElementById('signup-password');
+        const resetEmailInput = document.getElementById('reset-email');
+
+        // --- Helper Functions for UI Toggling ---
+        function showForm(formToShow) {
+            loginForm.classList.add('hidden');
+            signupForm.classList.add('hidden');
+            forgotPasswordForm.classList.add('hidden');
+            authErrorMessage.textContent = ''; // Clear previous errors
+            formToShow.classList.remove('hidden');
+        }
+
+        showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
+        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+        showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
+        backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+
+        // --- Firebase Auth Functions ---
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
+        // Function to update UI based on auth state
+        async function updateAuthUI(user) {
+            if (user) {
+                authFormContainer.classList.add('hidden'); // Hide forms
+                authStatusDiv.classList.remove('hidden'); // Show status
+                authMessage.textContent = 'You are signed in!';
+                userIdDisplay.textContent = `User ID: ${user.uid}`;
+                await updateProStatusUI(); // Update Pro status display after user is known
+            } else {
+                authStatusDiv.classList.add('hidden'); // Hide status
+                authFormContainer.classList.remove('hidden'); // Show forms
+                showForm(loginForm); // Show login form by default
+                authMessage.textContent = 'Not signed in.';
+                userIdDisplay.textContent = '';
+            }
+        }
+
+        // Function to update Pro Status UI (reads from Firestore)
+        async function updateProStatusUI() {
+            const isProSubscriber = await getProSubscriberStatus(); // Get status from Firestore
+            const articleLinks = document.querySelectorAll('.articles-list a');
+            articleLinks.forEach(link => {
+                let proBadge = link.querySelector('.pro-badge');
+                if (link.dataset.pro === 'true') {
+                    if (!proBadge) {
+                        const span = document.createElement('span');
+                        span.className = 'pro-badge';
+                        span.textContent = 'PRO';
+                        link.querySelector('span:not(.release-date)').appendChild(span);
+                    }
+                } else {
+                    if (proBadge) {
+                        proBadge.remove();
+                    }
+                }
+            });
+        }
+
+        // --- Event Listeners for Forms ---
+
+        // Login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginEmailInput.value;
+            const password = loginPasswordInput.value;
+            authErrorMessage.textContent = '';
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                alert('Successfully logged in!'); // Replace with custom modal
+            } catch (error) {
+                console.error("Login error:", error);
+                authErrorMessage.textContent = error.message;
+            }
+        });
+
+        // Sign Up
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = signupEmailInput.value;
+            const password = signupPasswordInput.value;
+            authErrorMessage.textContent = '';
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                alert('Account created successfully! You are now logged in.'); // Replace with custom modal
+            } catch (error) {
+                console.error("Sign up error:", error);
+                authErrorMessage.textContent = error.message;
+            }
+        });
+
+        // Forgot Password
+        forgotPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = resetEmailInput.value;
+            authErrorMessage.textContent = '';
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Password reset email sent! Check your inbox.'); // Replace with custom modal
+                showForm(loginForm); // Go back to login form
+            } catch (error) {
+                console.error("Password reset error:", error);
+                authErrorMessage.textContent = error.message;
+            }
+        });
+
+        // Sign Out
+        signOutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                alert('You have been signed out.');
+            } catch (error) {
+                console.error("Error signing out:", error);
+                alert('Error signing out. Please try again.');
+            }
+        });
+
+        // Handle clicks on article links (now checks Firestore status)
+        document.querySelectorAll('.articles-list a').forEach(link => {
+            link.addEventListener('click', async function(event) {
+                const isProArticle = this.dataset.pro === 'true';
+                const isUserPro = await getProSubscriberStatus(); // Check live Firestore status
+
+                if (isProArticle && !isUserPro) {
+                    event.preventDefault(); // Stop navigation
+                    alert('This content is for Pro Subscribers only! Please subscribe to unlock.'); // Custom modal would be better
+                    window.open('https://buy.stripe.com/eVq00ldtC8408cxfZwabK00', '_blank'); // Redirect to Stripe
+                }
+            });
+        });
+
+        // Initial Auth State Check and Anonymous/Custom Token Sign-in
+        onAuthStateChanged(auth, (user) => {
+            updateAuthUI(user);
+            if (!user) {
+                // If no user is signed in, attempt anonymous or custom token sign-in
+                if (initialAuthToken) {
+                    signInWithCustomToken(auth, initialAuthToken)
+                        .then((userCredential) => {
+                            console.log("Signed in with custom token:", userCredential.user.uid);
+                            // updateAuthUI will be called again by onAuthStateChanged listener
+                        })
+                        .catch((error) => {
+                            console.error("Error signing in with custom token:", error);
+                            signInAnonymously(auth)
+                                .then(() => console.log("Signed in anonymously (fallback)."))
+                                .catch(e => console.error("Error signing in anonymously:", e));
+                        });
+                } else {
+                    signInAnonymously(auth)
+                        .then(() => console.log("Signed in anonymously."))
+                        .catch(e => console.error("Error signing in anonymously:", e));
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+```
+I understand! You want to add the AI disclosure to the footer of the `toddler-blog` homepage.
+
+Here's the updated HTML for Lucy and Lala's main blog homepage (`toddler-blog`):
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucy and Lala's Super Cutesy Adventures</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff0f5; /* Blush pink for an even cutesier feel */
+        }
+        .container {
+            max-width: 900px; /* Max width for content */
+        }
+        .blog-post {
+            background-color: #ffffff; /* White background for posts */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); /* Softer, more diffused shadow */
+            border: 4px solid #fecdd3; /* Rose pink, slightly thicker border */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
+        }
+        .blog-post:hover {
+            transform: translateY(-5px); /* Gentle lift on hover */
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+        }
+        .btn-primary {
+            background-color: #ff85a2; /* Brighter, more vibrant pink */
+            color: #ffffff;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            border: 2px solid #ffffff; /* White border for a cute outline */
+        }
+        .btn-primary:hover {
+            background-color: #ff6b8f; /* Darker pink on hover */
+            transform: translateY(-3px) scale(1.05); /* More pronounced lift and slight scale */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+        }
+        .header-bg {
+            background-image: linear-gradient(to right, #fbcfe8, #fbc0f8); /* Softer, more magical gradient */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* Subtle text shadow for header */
+        }
+        h1 {
+            font-weight: 900; /* Even bolder font for the main title */
+        }
+        h2 {
+            font-weight: 800; /* Bolder font for post titles */
+        }
+        .text-cutesy-pink {
+            color: #ff85a2; /* Custom cutesy pink color */
+        }
+        .auth-status, .auth-form-container {
+            background-color: #fef3c7; /* Light yellow for status/form */
+            border: 2px solid #fcd34d; /* Yellow border */
+            color: #92400e; /* Darker yellow text */
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .auth-form-container input {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #fcd34d;
+            margin-bottom: 0.75rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .auth-form-container button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .auth-form-container .btn-auth-primary {
+            background-color: #6366f1; /* Indigo */
+            color: white;
+        }
+        .auth-form-container .btn-auth-primary:hover {
+            background-color: #4f46e5;
+        }
+        .auth-form-container .btn-auth-secondary {
+            background-color: #fcd34d; /* Yellow */
+            color: #92400e;
+        }
+        .auth-form-container .btn-auth-secondary:hover {
+            background-color: #fbbf24;
+        }
+        .pro-subscriber-callout, .donation-callout, .articles-list-callout {
+            background-image: linear-gradient(to right, #a78bfa, #c4b5fd); /* Violet gradient */
+            color: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .pro-subscriber-callout .btn-secondary, .donation-callout .btn-secondary, .articles-list-callout .btn-secondary {
+            background-color: #ffffff;
+            color: #a78bfa; /* Violet 400 */
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            border: 2px solid #ffffff;
+        }
+        .pro-subscriber-callout .btn-secondary:hover, .donation-callout .btn-secondary:hover, .articles-list-callout .btn-secondary:hover {
+            background-color: #f3e8ff; /* Lighter violet */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .donation-image {
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .articles-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* Center the cards */
+            gap: 1.5rem; /* Space between cards */
+        }
+        .articles-list li {
+            width: calc(50% - 0.75rem); /* Two columns on larger screens */
+            max-width: 350px; /* Increased max width for each card */
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .articles-list li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .articles-list a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+            height: 100%; /* Ensure consistent height for cards */
+        }
+        .articles-list a:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .article-thumbnail {
+            width: 100%;
+            height: 220px; /* Increased height for thumbnails */
+            object-fit: cover;
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        .pro-badge {
+            background-color: #ef4444; /* Red for PRO */
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        .release-date {
+            font-size: 0.875rem; /* text-sm */
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.25rem;
+        }
+        @media (max-width: 640px) {
+            .articles-list li {
+                width: 100%; /* Single column on small screens */
+            }
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-600">
+    <div class="min-h-screen flex flex-col items-center py-8 px-4">
+        <!-- Firebase Auth Status and Forms -->
+        <div id="auth-container" class="w-full container mx-auto text-center mb-8">
+            <div id="auth-status" class="p-4 hidden">
+                <p class="font-semibold text-lg" id="auth-message"></p>
+                <p class="text-sm" id="user-id"></p>
+                <button id="sign-out-button" class="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors">Sign Out</button>
             </div>
 
             <!-- auth-form-container is now visible by default -->
@@ -589,7 +1300,7 @@
                 userIdDisplay.textContent = `User ID: ${user.uid}`;
                 await updateProStatusUI(); // Update Pro status display after user is known
             } else {
-                  authStatusDiv.classList.add('hidden'); // Hide status
+                authStatusDiv.classList.add('hidden'); // Hide status
                 authFormContainer.classList.remove('hidden'); // Show forms
                 showForm(loginForm); // Show login form by default
                 authMessage.textContent = ''; // Clear previous messages
@@ -714,12 +1425,9 @@
                     }
                 }
             });
-        } else { // If auth is not initialized
-            // Handle cases where Firebase is not available
-            authStatusDiv.classList.add('hidden');
-            authFormContainer.classList.remove('hidden');
-            showForm(loginForm);
-            authErrorMessage.textContent = 'Authentication is not available. Please try again later.';
+        } else { // If Firebase is not initialized, hide auth forms and display error
+            authContainer.classList.add('hidden');
+            console.error("Authentication features are disabled because Firebase is not configured.");
         }
     </script>
 </body>
