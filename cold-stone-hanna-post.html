@@ -217,10 +217,15 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global variables for Firebase config and app ID
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+    const firebaseConfig = {
+    apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+    authDomain: "lucyandlala.firebaseapp.com",
+    projectId: "lucyandlala",
+    storageBucket: "lucyandlala.firebasestorage.app",
+    messagingSenderId: "422161772278",
+    appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+    measurementId: "G-JZJK3JWCKH"
+};
 
         let app = null;
         let auth = null;
