@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Homemade Organic PB&J - Lucy and Lala's Techy Kids Blog</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #ffe6f0, #e0f7ff); min-height: 100vh; padding-bottom: 3rem; }
+        h1, h2, h3 { font-family: 'Press Start 2P', cursive; }
+        .neon-border { border: 4px solid transparent; border-radius: 1.5rem; background: linear-gradient(#fff, #fff) padding-box, linear-gradient(90deg, #ff85a2, #4fc3f7, #ffeb3b) border-box; }
+        .btn-techy { background: linear-gradient(90deg, #4fc3f7, #ff85a2); color: #fff; font-weight: bold; transition: transform 0.2s ease, box-shadow 0.2s ease; border-radius: 9999px; }
+        .btn-techy:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(79, 195, 247, 0.8); }
+        .media-block img { border-radius: 1rem; border: 3px solid #4fc3f7; }
+        .recipe-list li::before { content: '💾'; margin-right: 0.75rem; }
+        /* Overlays */
+        .locked-overlay, .pro-content-overlay { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; z-index: 9999; background: rgba(255,255,255,.98); }
+        .locked-overlay h3, .pro-content-overlay h3 { color: #ef4444; font-size: 1.75rem; margin-bottom: .5rem; }
+        .locked-overlay p, .pro-content-overlay p { color: #4b5563; margin: .25rem 0; }
+        .locked-overlay a, .pro-content-overlay a { background: #ef4444; color: #fff; padding: .75rem 1.5rem; border-radius: 9999px; font-weight: 700; }
+        .locked-overlay a:hover, .pro-content-overlay a:hover { background: #dc2626; }
+    </style>
+
+    <!-- Content Lock Script (fixes ReferenceError: initialAuthToken) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+     
+        const firebaseConfig = {
+            apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+            authDomain: "lucyandlala.firebaseapp.com",
+            projectId: "lucyandlala",
+            storageBucket: "lucyandlala.firebasestorage.app",
+            messagingSenderId: "422161772278",
+            appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+            measurementId: "G-JZJK3JWCKH"
+        };
+
+        let app = null, auth = null, db = null, currentUserId = null;
+
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase services initialized.");
+        } else {
+            console.warn("Firebase config not found. Authentication and Pro status will not be available.");
+        }
+
+        // Small helper to detect admin-restricted error
+        function isAdminRestrictedError(err){
+            return !!(err && (err.code === 'auth/admin-restricted-operation' || /admin-restricted/i.test(err.message || '')));
+        }
+
+        // Hardened sign-in: try custom token when provided, otherwise fall back to anonymous. Never crash.
+        async function safeClientSignIn(auth, token){
+            if (!auth) return null;
+            if (auth.currentUser) return auth.currentUser;
+            if (token && typeof token === 'string' && token.trim().length) {
+                try { const cred = await signInWithCustomToken(auth, token); return cred.user; }
+                catch (e) { console.warn('Custom-token sign-in failed; falling back to anonymous:', e?.code || e); }
+            }
+            try { const cred = await signInAnonymously(auth); return cred.user; }
+            catch (e) { console.warn('Anonymous sign-in failed (enable it in Firebase Console):', e?.code || e); return null; }
+        }
+
+        async function getAuthenticatedUserId(){
+            if (!auth) return null;
+            return new Promise(resolve => {
+                const unsub = onAuthStateChanged(auth, (user)=>{ unsub(); currentUserId = user?.uid || null; resolve(currentUserId); });
+            });
+        }
+
+        async function getProSubscriberStatus(){
+            if (!db) return false;
+            const userId = await getAuthenticatedUserId();
+            if (!userId) { console.warn('No user; treating as non-Pro'); return false; }
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists()) { const data = docSnap.data(); return data.isProSubscriber === true; }
+                return false;
+            } catch (error) {
+                console.warn('Error fetching subscriber status (treating as non-Pro):', error?.code || error);
+                return false;
+            }
+        }
+
+        const releaseDate = new Date('2025-08-30T00:00:00');
+        const currentDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await safeClientSignIn(auth, initialAuthToken);
+
+            if (currentDate < releaseDate) {
+                // Append overlay (do NOT replace body to avoid destroying scripts/styles)
+                document.body.insertAdjacentHTML('beforeend', `
+                    <div class="locked-overlay" data-testid="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This exclusive adventure will be released on August 30, 2025!</p>
+                        <p>Check back soon to see Lucy and Lala's Organic PB&J Sandwiches!</p>
+                        <a href="toddler-blog" class="mt-4">Back to All Adventures! 🎀</a>
+                    </div>
+                `);
+                document.body.style.overflow = 'hidden';
+            } else {
+                const isProSubscriber = await getProSubscriberStatus();
+                if (!isProSubscriber) {
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        mainContent.insertAdjacentHTML('afterbegin', `
+                            <div class="pro-content-overlay" data-testid="pro-overlay">
+                                <h3>🔒 Pro Content Only!</h3>
+                                <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                                <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                            </div>
+                        `);
+                        const contentToBlur = mainContent.querySelector('article, .blog-article');
+                        if (contentToBlur) {
+                            contentToBlur.style.filter = 'blur(5px)';
+                            contentToBlur.style.pointerEvents = 'none';
+                        }
+                    }
+                }
+            }
+
+            // --- Minimal Test Suite (since none existed) ---
+            (function runTests(){
+                const results = [];
+                const t = (name, pass) => { results.push({ test: name, pass: !!pass }); console.assert(pass, name); };
+                try {
+                    t('initialAuthToken is defined', typeof initialAuthToken !== 'undefined');
+                    t('appId is defined', typeof appId !== 'undefined');
+                    t('releaseDate is Date', releaseDate instanceof Date);
+                    if (currentDate < releaseDate) {
+                        t('Locked overlay injected', !!document.querySelector('[data-testid="locked-overlay"]'));
+                    } else {
+                        t('Article or Pro overlay present after release', !!document.querySelector('article, .blog-article') || !!document.querySelector('[data-testid="pro-overlay"]'));
+                    }
+                    t('safeClientSignIn exists', typeof safeClientSignIn === 'function');
+                    t('Admin-restricted detection works', (function(){ return (function isAdminRestrictedErrorLocal(err){ return !!(err && (err.code === 'auth/admin-restricted-operation' || /admin-restricted/i.test(err.message || ''))); })({code:'auth/admin-restricted-operation'}); })());
+                } catch (e) {
+                    console.error('Test suite error:', e);
+                } finally {
+                    console.table(results);
+                }
+            })();
+        });
+    </script>
+</head>
+
+<body class="flex flex-col items-center">
+    <header class="w-full text-center p-6 neon-border mt-6">
+        <h1 class="text-3xl md:text-4xl text-pink-600">🥪 PB&J Adventure Mode: ON! 🚀</h1>
+        <p class="text-lg text-gray-700">Lucy & Lala take their snack game to the next level with a techy twist!</p>
+    </header>
+
+    <main class="container max-w-3xl mx-auto p-6 mt-6 bg-white rounded-2xl shadow-lg">
+        <div class="media-block mb-6">
+            <img src="https://i.imgur.com/mh5ABKR.jpeg" alt="Lucy and Lala making sandwiches" />
+        </div>
+        <p class="mb-4 text-gray-700">Think PB&J is just bread and spreads? Not here! We’ve coded the perfect recipe for giggles, full tummies, and toddler chef pride. Lucy and Lala are all about flavor + fun, and today’s snack time felt like launching a tasty new app. The kitchen was full of soft laughter as the girls took their first bites—crumbs clinging to tiny fingers, jelly peeking out from between fluffy bread slices. Their eyes lit up at the sweetness, and each bite turned into a happy hum of approval.</p>
+
+        <p class="mb-6 text-gray-700"><strong>👗 Perfect Tech Outfit (Not in Photos):</strong> Lucy would be in a neon-pink hoodie with pixel heart patches and holographic leggings. Lala’s look would be a turquoise sweatshirt with tiny game controllers, plus glittery silver light-up sneakers. Perfect for gamer-kid energy. Find similar styles at <a href="https://www2.hm.com" target="_blank" class="text-blue-500 underline">H&M Kids</a>, <a href="https://www.target.com/c/cat-jack/-/N-56h5g" target="_blank" class="text-blue-500 underline">Target Cat & Jack</a>, or <a href="https://www.shopjustice.com" target="_blank" class="text-blue-500 underline">Justice</a>.</p>
+
+        <p class="mb-6 text-gray-700"><strong>🖼️ What They’re Actually Wearing in the Photos:</strong> In the first PB&J photo, Lucy wears a cream long-sleeve top with tiny floral prints, while Lala rocks a striped sweater in berry, pink, mustard, and cream. In the second, Lucy’s in a mauve sweatshirt and Lala’s in a beige dress with white heart patterns and a Peter Pan collar. These cozy, casual outfits are perfect for a homestyle snack moment. Look for similar at <a href="https://oldnavy.gap.com" target="_blank" class="text-blue-500 underline">Old Navy</a>, <a href="https://www.carters.com" target="_blank" class="text-blue-500 underline">Carter’s</a>, or <a href="https://www.etsy.com" target="_blank" class="text-blue-500 underline">Etsy</a> boutiques.</p>
+
+        <p class="mb-6 text-gray-700">The girls savored each bite slowly, alternating between big giggly chomps and little nibbles. Lucy, with jelly at the corner of her mouth, grinned at Lala, who was already halfway through hers. Their tiny feet swung beneath the table in perfect rhythm, making snack time feel like its own joyful dance. Every crunch of bread and soft smear of peanut butter was a reminder that sometimes, the simplest foods make the happiest memories.</p>
+
+        <p class="mb-6 text-gray-700"><strong>🌱 Where to Find Organic Ingredients:</strong> For the freshest organic bread, check local farmers’ markets or health-focused grocery stores like <a href="https://www.wholefoodsmarket.com" target="_blank" class="text-blue-500 underline">Whole Foods</a>, <a href="https://www.sprouts.com" target="_blank" class="text-blue-500 underline">Sprouts</a>, or <a href="https://www.freshthyme.com" target="_blank" class="text-blue-500 underline">Fresh Thyme</a>. Organic peanut butter can be found in most supermarkets—look for brands like <a href="https://www.maranathafoods.com" target="_blank" class="text-blue-500 underline">MaraNatha</a>, <a href="https://onceagainnutbutter.com" target="_blank" class="text-blue-500 underline">Once Again</a>, or store-label organics that contain only peanuts (and maybe salt). For organic fruit spreads, shop at natural food stores or order online from companies like <a href="https://croftersorganic.com" target="_blank" class="text-blue-500 underline">Crofter’s Organic</a> or <a href="https://www.bonnemaman.us/collections/organic" target="_blank" class="text-blue-500 underline">Bonne Maman Organic</a>. Fresh organic bananas or berries can be sourced from local produce stands, or you can subscribe to produce boxes like <a href="https://www.misfitsmarket.com" target="_blank" class="text-blue-500 underline">Misfits Market</a> for regular deliveries.</p>
+
+        <h2 class="text-2xl text-blue-500 mb-2">Recipe Patch v1.1 📝</h2>
+        <ul class="recipe-list mb-6">
+            <li>2 slices Organic Whole Wheat Bread (from <a href="https://www.wholefoodsmarket.com" target="_blank" class="text-blue-500 underline">Whole Foods</a> or <a href="https://www.sprouts.com" target="_blank" class="text-blue-500 underline">Sprouts</a>)</li>
+            <li>2 tbsp Organic Creamy Peanut Butter (like <a href="https://www.maranathafoods.com" target="_blank" class="text-blue-500 underline">MaraNatha</a> or <a href="https://onceagainnutbutter.com" target="_blank" class="text-blue-500 underline">Once Again</a>)</li>
+            <li>2 tbsp Organic Fruit Spread/Jelly (try <a href="https://croftersorganic.com" target="_blank" class="text-blue-500 underline">Crofter’s</a> or <a href="https://www.bonnemaman.us/collections/organic" target="_blank" class="text-blue-500 underline">Bonne Maman</a>)</li>
+            <li>(Optional) Banana or berries (local produce stand or <a href="https://www.misfitsmarket.com" target="_blank" class="text-blue-500 underline">Misfits Market</a>)</li>
+        </ul>
+
+        <h3 class="text-xl text-pink-500 mb-2">Build Instructions 🛠️</h3>
+        <ul class="recipe-list mb-6">
+            <li><strong>Step 1:</strong> Lay your bread slices on a clean cutting board. Make sure they’re soft and fresh—give them a gentle press to check. Spread the peanut butter evenly on one slice using a butter knife, going all the way to the edges for maximum flavor in every bite.</li>
+            <li><strong>Step 2:</strong> On the second slice, spread the fruit jelly just as evenly, ensuring you cover the entire surface. Use slow, smooth strokes so the bread stays fluffy. If your jelly is thick, stir it briefly in a small bowl to loosen before spreading.</li>
+            <li><strong>Step 3:</strong> If adding banana or berries, arrange them in a single layer over the peanut butter side, pressing lightly so they stick without squishing. Rinse berries thoroughly and pat dry before adding.</li>
+            <li><strong>Step 4:</strong> Gently place the jelly-covered slice on top of the peanut butter slice. Press lightly along the edges to seal and prevent filling from escaping.</li>
+            <li><strong>Step 5:</strong> Slice into triangles, squares, or use cookie cutters for fun shapes. Wipe away any jelly drips for a neat presentation, then serve immediately to enjoy peak freshness!</li>
+        </ul>
+
+        <div class="media-block mb-6">
+            <img src="https://i.imgur.com/HArbSxY.jpeg" alt="Close up of PB&J" />
+        </div>
+        <p class="text-gray-700">Snack complete! Ready for game time or coding club. Every bite = XP earned toward ‘Happy Belly’ achievement.</p>
+
+        <div class="text-center mt-6">
+            <button class="btn-techy py-3 px-6">❤️ Like This Post!</button>
+        </div>
+    </main>
+
+    <footer class="w-full text-center py-6 text-gray-600 mt-6">&copy; 2025 Lucy and Lala Adventures | All Rights Reserved</footer>
+</body>
+</html>
