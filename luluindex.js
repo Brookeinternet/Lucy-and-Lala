@@ -1,8 +1,20 @@
-// luluindex.js — single-file Express server (ESM)
-// Printful-ready, with mock fallback, CORS, and /health.
+// luluindex.js — single-file Express server (no dotenv)
 
-import dotenv from 'dotenv';
-dotenv.config();
+// Pull env vars directly from process.env (Render sets these automatically)
+const {
+  PORT = 3000,
+  NODE_ENV = 'development',
+  FRONTEND_ORIGIN = 'https://<https://brookeinternet.github.io',
+
+  // Printful config
+  LULU_API_BASE_URL = 'https://api.printful.com',
+  LULU_AUTH_SCHEME = 'Basic',       // Printful uses Basic <base64(apikey:)>
+  LULU_API_KEY = 'JuWNtfNQsIW2OJdFMKd8OcBzYT2HWL3d12rmY1bb',                // <-- your Printful API key
+  LULU_PRODUCTS_SOURCE = 'store',   // 'store' | 'catalog'
+
+  // Control live vs mock
+  USE_MOCK = '1'
+} = process.env;
 
 import express from 'express';
 import cors from 'cors';
@@ -11,30 +23,13 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import fetch from 'node-fetch';
 
-// ------- ENV -------
-const {
-  PORT = 3000,
-  NODE_ENV = 'development',
-  FRONTEND_ORIGIN = '',
-
-  // Printful config
-  LULU_API_BASE_URL = 'https://api.printful.com',
-  LULU_AUTH_SCHEME = 'Basic',       // Printful uses Basic <base64(apikey:)>
-  LULU_API_KEY = '',                // <-- your Printful API key
-  LULU_PRODUCTS_SOURCE = 'store',   // 'store' | 'catalog'
-
-  // Control live vs mock
-  USE_MOCK = '1'
-} = process.env;
-
-// ------- ONE app (do not declare again) -------
 const app = express();
 
 // ------- Middleware -------
 const allowed = [FRONTEND_ORIGIN, 'http://localhost:3000', 'http://127.0.0.1:3000'].filter(Boolean);
 app.use(cors({
   origin(origin, cb) {
-    if (!origin) return cb(null, true); // curl/server-to-server
+    if (!origin) return cb(null, true);
     cb(null, allowed.includes(origin));
   },
   methods: ['GET','POST','OPTIONS'],
@@ -108,19 +103,17 @@ app.get('/api/lulu/products', async (_req, res) => {
     return res.json(normalizeProducts(raw));
   } catch (e) {
     console.error('products error', e);
-    return res.status(200).json(mockProducts()); // keep frontend rendering
+    return res.status(200).json(mockProducts());
   }
 });
 
 app.post('/api/lulu/checkout', async (req, res) => {
   const { productId } = req.body || {};
   if (!productId) return res.status(400).json({ error:'MISSING_PRODUCT_ID' });
-  // TODO: real checkout (Stripe/Printful). For now return a stub URL.
   return res.json({ url: `https://example.com/checkout?pid=${encodeURIComponent(productId)}` });
 });
 
-// ------- Start (only once) -------
+// ------- Start -------
 app.listen(PORT, () => console.log(`Lulu backend listening on :${PORT}`));
 
-// Optional export for tests (doesn’t redeclare app)
 export default app;
