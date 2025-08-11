@@ -1,3 +1,18 @@
+// server.js (ESM)
+import express from 'express';
+const app = express();
+
+// define routes ON app here:
+app.all('/health', (_req, res) => res.status(200).send('ok'));
+app.get('/api/lulu/products', /* your handler */);
+app.post('/api/lulu/checkout', /* your handler */);
+
+export default app; // IMPORTANT
+
+
+
+
+
 app.get('/api/lulu/products', async (_req, res) => {
   try {
     const source = (process.env.LULU_PRODUCTS_SOURCE || 'store').toLowerCase();
