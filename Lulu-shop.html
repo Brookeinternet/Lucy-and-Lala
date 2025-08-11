@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lulu — Lucy & Lala’s Shop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #fff0f5; }
+    .header-bg { background-image: linear-gradient(to right, #fbcfe8, #fbc0f8); }
+    .card { background:#fff; border:3px solid #fecdd3; border-radius:1rem; transition:transform .2s ease, box-shadow .2s ease; }
+    .card:hover { transform: translateY(-4px); box-shadow:0 8px 16px rgba(0,0,0,.15); }
+    .btn-primary { background:#ff85a2; color:#fff; padding:.75rem 1.25rem; border-radius:9999px; font-weight:700; }
+    .btn-primary:hover { background:#ff6b8f; }
+    .badge { display:inline-flex; align-items:center; gap:.4rem; padding:.25rem .6rem; border-radius:9999px; font-size:.75rem; font-weight:700; }
+    .btn-ghost { padding:.5rem 1rem; border-radius:9999px; font-weight:700; }
+    details[open] summary { border-bottom: 1px dashed rgba(0,0,0,.15); margin-bottom:.5rem; }
+  </style>
+</head>
+<body class="antialiased">
+  <header class="header-bg p-8 text-center text-white rounded-b-3xl shadow-lg">
+    <h1 class="text-6xl font-extrabold">🛍️ Lulu — Lucy & Lala’s Shop</h1>
+    <p class="mt-3 text-2xl">Adorable finds from Lucy & Lala’s world ✨</p>
+    <div id="health" class="mt-4 text-sm"></div>
+  </header>
+
+  <main class="container mx-auto py-10 px-4">
+    <div class="mb-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+      <div id="status" class="text-gray-700"></div>
+      <div class="flex items-center gap-3">
+        <button id="retry" class="btn-ghost bg-white border border-pink-200 text-pink-700 hover:bg-pink-50">Retry</button>
+        <label class="inline-flex items-center gap-2 text-sm text-pink-800">
+          <input id="mock-toggle" type="checkbox" class="h-4 w-4" /> Use demo products if backend is unreachable
+        </label>
+      </div>
+    </div>
+
+    <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"></div>
+
+    <details class="mt-10">
+      <summary class="cursor-pointer text-pink-800 font-bold">Diagnostics</summary>
+      <pre id="diag" class="text-xs bg-white/60 border border-pink-200 rounded-lg p-3 overflow-auto"></pre>
+    </details>
+  </main>
+
+  <footer class="bg-white border-t-4 border-pink-300 rounded-t-3xl shadow-inner text-center py-8">
+    <p class="text-gray-600 font-bold">© 2025 Lulu — Lucy & Lala. The toddlers are AI characters. 🌈</p>
+  </footer>
+
+  <script>
+    // --- CONFIG ---
+    const API_BASE = 'https://lucy-and-lala-1.onrender.com';
+    const params = new URLSearchParams(location.search);
+    const FORCE_FAIL = params.get('forceFail') === '1';
+    const DEFAULT_MOCK = params.get('mock') === '1' || localStorage.getItem('lulu.useMock') === '1';
+
+    // --- ELEMENTS ---
+    const els = {
+      status: () => document.getElementById('status'),
+      health: () => document.getElementById('health'),
+      list: () => document.getElementById('product-list'),
+      retry: () => document.getElementById('retry'),
+      mockToggle: () => document.getElementById('mock-toggle'),
+      diag: () => document.getElementById('diag')
+    };
+
+    // --- UTIL ---
+    function money(v){
+      if (v == null || v === '') return '';
+      const n = typeof v === 'number' ? v : Number(v);
+      return n.toLocaleString(undefined,{ style:'currency', currency:'USD' });
+    }
+
+    function logDiag(obj){
+      try { els.diag().textContent = JSON.stringify(obj, null, 2); } catch {}
+    }
+
+    function mockProducts(){
+      return [
+        { id:'mock-tee-pink', title:'Lulu Pink Tee', price:19.99, image:'https://i.imgur.com/jXcGCKg.png', description:'Soft tee with strawberry sprinkles.' },
+        { id:'mock-romper-stars', title:'Star Romper', price:24.5, image:'https://i.imgur.com/WxA5W6K.png', description:'Comfy romper with twinkle stars.' },
+        { id:'mock-mug-heart', title:'Heart Mug', price:12.0, image:'https://i.imgur.com/C2BDyp6.jpeg', description:'Cozy mug for cocoa time.' }
+      ];
+    }
+
+    function safeResponse(error){
+      return {
+        ok: false,
+        status: 0,
+        _error: error,
+        json: async () => ({}),
+        text: async () => String(error && (error.message || error))
+      };
+    }
+
+    async function fetchWithTimeout(url, opts = {}, ms = 10000) {
+      if (FORCE_FAIL) return safeResponse(new Error('Forced network failure for testing'));
+      try {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), ms);
+        const res = await fetch(url, { ...opts, signal: controller.signal });
+        clearTimeout(id);
+        return res;
+      } catch (e) {
+        // Never propagate rejections — always return a safe, non-throwing response
+        return safeResponse(e);
+      }
+    }
+
+    function setHealthBadge(ok){
+      els.health().innerHTML = ok
+        ? '<span class="badge bg-white text-green-700 border border-green-300">● Live</span>'
+        : '<span class="badge bg-white text-red-700 border border-red-300">● Offline</span>';
+    }
+
+    async function pingHealth(){
+      const res = await fetchWithTimeout(`${API_BASE}/health`, { cache: 'no-store', mode: 'no-cors' }, 5000);
+      // In no-cors, response is opaque and ok may be false — treat as best-effort
+      setHealthBadge(res && res.ok);
+    }
+
+    function renderProducts(products){
+      const root = els.list();
+      root.innerHTML = products.map(p => `
+        <article class="card p-5 flex flex-col">
+          <img src="${p.image || ''}" alt="${p.title || 'Product'}" class="w-full h-64 object-cover rounded-lg mb-4 border border-pink-100" onerror="this.src='https://placehold.co/600x400?text=No+Image'">
+          <h3 class="text-xl font-extrabold text-pink-700 mb-1">${p.title || 'Untitled Item'}</h3>
+          <p class="text-gray-700 mb-4">${p.description ? String(p.description) : ''}</p>
+          <div class="mt-auto flex items-center justify-between">
+            <span class="text-lg font-black text-pink-800">${money(p.price)}</span>
+            <button class="btn-primary" onclick="startCheckout('${p.id || ''}')">Buy</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function engageMockFallback(reason){
+      els.mockToggle().checked = true;
+      localStorage.setItem('lulu.useMock', '1');
+      renderProducts(mockProducts());
+      els.status().innerHTML = '<span class="text-yellow-700">Backend unreachable. Showing demo products.</span>';
+      logDiag({ error: String(reason && (reason.message || reason)), action: 'mock-fallback', API_BASE, time: new Date().toISOString() });
+    }
+
+    async function loadProducts(){
+      const useMock = els.mockToggle().checked;
+      els.status().textContent = 'Loading products…';
+      try {
+        if (useMock) {
+          renderProducts(mockProducts());
+          els.status().textContent = '';
+          logDiag({ mode: 'mock', reason: 'toggle-enabled' });
+          return;
+        }
+        const res = await fetchWithTimeout(`${API_BASE}/api/lulu/products`, { cache: 'no-store' }, 10000);
+        if (!res.ok) throw new Error('Products load failed: ' + (res.status || 'network'));
+        const data = await res.json().catch(() => ({}));
+        const products = Array.isArray(data.products) ? data.products : [];
+        if (!products.length) {
+          els.status().textContent = 'No products yet — check back soon!';
+          els.list().innerHTML = '';
+          logDiag({ mode: 'live', products: 0 });
+          return;
+        }
+        els.status().textContent = '';
+        renderProducts(products);
+        logDiag({ mode: 'live', products: products.length });
+      } catch (e) {
+        console.error(e);
+        engageMockFallback(e);
+      }
+    }
+
+    async function startCheckout(productId){
+      const useMock = els.mockToggle().checked;
+      if (!productId) return alert('Missing product id.');
+      if (useMock) {
+        const demo = `https://example.com/checkout?pid=${encodeURIComponent(productId)}`;
+        location.href = demo;
+        return;
+      }
+      const res = await fetchWithTimeout(`${API_BASE}/api/lulu/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      }, 10000);
+      if (!res.ok) {
+        engageMockFallback('checkout-failed');
+        const demo = `https://example.com/checkout?pid=${encodeURIComponent(productId)}`;
+        location.href = demo;
+        return;
+      }
+      const { url } = await res.json().catch(() => ({}));
+      if (url) window.location.href = url; else alert('Checkout link not available.');
+    }
+
+    // Global guards: prevent network errors from surfacing as uncaught
+    window.addEventListener('unhandledrejection', (e) => {
+      e.preventDefault();
+      logDiag({ unhandledRejection: String(e.reason && (e.reason.message || e.reason)) });
+    });
+    window.addEventListener('error', (e) => {
+      e.preventDefault();
+      logDiag({ globalError: e.message });
+    }, true);
+
+    // --- TESTS (do not remove existing; add more) ---
+    (function selfTests(){
+      const tests = [];
+      tests.push(['DOM has product list container', !!document.getElementById('product-list')]);
+      tests.push(['API_BASE set to live URL', API_BASE.includes('onrender.com')]);
+      tests.push(['Mock toggle exists', !!els.mockToggle()]);
+      tests.push(['Retry button exists', !!els.retry()]);
+      console.table(tests.map(([name, pass]) => ({ test: name, pass })));
+
+      // Badge render test (no network dependency)
+      setHealthBadge(true);
+      const liveBadge = els.health().textContent.includes('Live');
+      setHealthBadge(false);
+      const offlineBadge = els.health().textContent.includes('Offline');
+      console.table([
+        { test: 'Health badge shows Live', pass: liveBadge },
+        { test: 'Health badge shows Offline', pass: offlineBadge }
+      ]);
+
+      // Ensure renderProducts paints at least 3 items
+      const before = els.list().children.length;
+      renderProducts(mockProducts());
+      const after = els.list().children.length;
+      console.table([{ test: 'renderProducts paints items', pass: after >= 3 }]);
+      els.list().innerHTML = '';
+
+      // Fallback tests when FORCE_FAIL is enabled — all network calls become safe responses
+      if (FORCE_FAIL) {
+        setTimeout(async () => {
+          await loadProducts();
+          setTimeout(() => {
+            const hasItems = els.list().children.length >= 3;
+            const toggleOn = els.mockToggle().checked === true;
+            const saved = localStorage.getItem('lulu.useMock') === '1';
+            console.table([
+              { test: 'auto-fallback renders mock items', pass: hasItems },
+              { test: 'auto-fallback enables toggle', pass: toggleOn },
+              { test: 'auto-fallback persisted to localStorage', pass: saved }
+            ]);
+          }, 200);
+        }, 0);
+      }
+    })();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      els.mockToggle().checked = DEFAULT_MOCK;
+      els.retry().addEventListener('click', () => { pingHealth(); loadProducts(); });
+      els.mockToggle().addEventListener('change', () => {
+        localStorage.setItem('lulu.useMock', els.mockToggle().checked ? '1' : '0');
+        loadProducts();
+      });
+      pingHealth();
+      loadProducts();
+    });
+  </script>
+</body>
+</html>
