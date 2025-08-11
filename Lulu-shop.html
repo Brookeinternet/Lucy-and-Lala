@@ -23,6 +23,7 @@
     <h1 class="text-6xl font-extrabold">🛍️ Lulu — Lucy & Lala’s Shop</h1>
     <p class="mt-3 text-2xl">Adorable finds from Lucy & Lala’s world ✨</p>
     <div id="health" class="mt-4 text-sm"></div>
+    <p class="mt-2 text-white/90 text-sm">Backend: <a href="https://lucy-and-lala.onrender.com" class="underline" target="_blank">https://lucy-and-lala.onrender.com</a></p>
   </header>
 
   <main class="container mx-auto py-10 px-4">
@@ -45,12 +46,12 @@
   </main>
 
   <footer class="bg-white border-t-4 border-pink-300 rounded-t-3xl shadow-inner text-center py-8">
-    <p class="text-gray-600 font-bold">© 2025 Lulu — Lucy & Lala. The toddlers are AI characters. 🌈</p>
+    <p class="text-gray-600 font-bold">&copy; 2025 Lulu — Lucy & Lala 🌈</p>
   </footer>
 
   <script>
     // --- CONFIG ---
-    const API_BASE = 'https://lucy-and-lala-1.onrender.com';
+    const API_BASE = 'https://lucy-and-lala.onrender.com';
     const params = new URLSearchParams(location.search);
     const FORCE_FAIL = params.get('forceFail') === '1';
     const DEFAULT_MOCK = params.get('mock') === '1' || localStorage.getItem('lulu.useMock') === '1';
@@ -69,6 +70,7 @@
     function money(v){
       if (v == null || v === '') return '';
       const n = typeof v === 'number' ? v : Number(v);
+      if (Number.isNaN(n)) return String(v);
       return n.toLocaleString(undefined,{ style:'currency', currency:'USD' });
     }
 
@@ -94,7 +96,7 @@
       };
     }
 
-    async function fetchWithTimeout(url, opts = {}, ms = 10000) {
+    async function fetchWithTimeout(url, opts = {}, ms = 12000) {
       if (FORCE_FAIL) return safeResponse(new Error('Forced network failure for testing'));
       try {
         const controller = new AbortController();
@@ -103,7 +105,7 @@
         clearTimeout(id);
         return res;
       } catch (e) {
-        // Never propagate rejections — always return a safe, non-throwing response
+        // Never throw; return a safe pseudo-response so callers can handle uniformly
         return safeResponse(e);
       }
     }
@@ -116,8 +118,30 @@
 
     async function pingHealth(){
       const res = await fetchWithTimeout(`${API_BASE}/health`, { cache: 'no-store', mode: 'no-cors' }, 5000);
-      // In no-cors, response is opaque and ok may be false — treat as best-effort
+      // In no-cors, response is opaque; treat as best-effort
       setHealthBadge(res && res.ok);
+    }
+
+    function normalizeProducts(data){
+      // Accept multiple shapes and return a uniform array of products
+      const pick = (obj, keys) => keys.find(k => obj && obj[k] !== undefined);
+      let arr = [];
+      if (Array.isArray(data)) arr = data;
+      else if (Array.isArray(data?.products)) arr = data.products;
+      else if (Array.isArray(data?.items)) arr = data.items;
+      else if (Array.isArray(data?.result)) arr = data.result;
+
+      return arr.map(p => ({
+        id: p.id ?? p.product_id ?? p.sku ?? p.external_id ?? cryptoRandomId(),
+        title: p.title ?? p.name ?? 'Untitled',
+        price: p.price ?? p.retail_price ?? p.amount ?? '',
+        image: p.image ?? p.thumbnail ?? p.thumbnail_url ?? '',
+        description: p.description ?? p.subtitle ?? ''
+      }));
+    }
+
+    function cryptoRandomId(){
+      try { return crypto.randomUUID(); } catch { return String(Math.random()).slice(2); }
     }
 
     function renderProducts(products){
@@ -153,14 +177,14 @@
           logDiag({ mode: 'mock', reason: 'toggle-enabled' });
           return;
         }
-        const res = await fetchWithTimeout(`${API_BASE}/api/lulu/products`, { cache: 'no-store' }, 10000);
+        const res = await fetchWithTimeout(`${API_BASE}/api/lulu/products`, { cache: 'no-store' }, 12000);
         if (!res.ok) throw new Error('Products load failed: ' + (res.status || 'network'));
         const data = await res.json().catch(() => ({}));
-        const products = Array.isArray(data.products) ? data.products : [];
+        const products = normalizeProducts(data);
         if (!products.length) {
           els.status().textContent = 'No products yet — check back soon!';
           els.list().innerHTML = '';
-          logDiag({ mode: 'live', products: 0 });
+          logDiag({ mode: 'live', products: 0, rawKeys: Object.keys(data || {}) });
           return;
         }
         els.status().textContent = '';
@@ -184,7 +208,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId })
-      }, 10000);
+      }, 12000);
       if (!res.ok) {
         engageMockFallback('checkout-failed');
         const demo = `https://example.com/checkout?pid=${encodeURIComponent(productId)}`;
@@ -205,7 +229,7 @@
       logDiag({ globalError: e.message });
     }, true);
 
-    // --- TESTS (do not remove existing; add more) ---
+    // --- TESTS (added) ---
     (function selfTests(){
       const tests = [];
       tests.push(['DOM has product list container', !!document.getElementById('product-list')]);
@@ -224,6 +248,16 @@
         { test: 'Health badge shows Offline', pass: offlineBadge }
       ]);
 
+      // Normalizer tests with different shapes
+      const shapes = [
+        { name: 'shape: products[]', data: { products: [{ id:1, title:'A', price:10 }] } },
+        { name: 'shape: items[]', data: { items: [{ product_id:2, name:'B', retail_price:12 }] } },
+        { name: 'shape: result[]', data: { result: [{ sku:'C-3', name:'C', thumbnail_url:'x.png' }] } },
+        { name: 'shape: raw array', data: [{ id:'Z', title:'Zed', price:5 }] }
+      ];
+      const normPass = shapes.every(s => Array.isArray(normalizeProducts(s.data)) && normalizeProducts(s.data).length === 1);
+      console.table([{ test: 'normalizeProducts handles multiple shapes', pass: normPass }]);
+
       // Ensure renderProducts paints at least 3 items
       const before = els.list().children.length;
       renderProducts(mockProducts());
@@ -231,7 +265,7 @@
       console.table([{ test: 'renderProducts paints items', pass: after >= 3 }]);
       els.list().innerHTML = '';
 
-      // Fallback tests when FORCE_FAIL is enabled — all network calls become safe responses
+      // Optional forced failure test
       if (FORCE_FAIL) {
         setTimeout(async () => {
           await loadProducts();
@@ -249,6 +283,7 @@
       }
     })();
 
+    // Wire up UI
     document.addEventListener('DOMContentLoaded', () => {
       els.mockToggle().checked = DEFAULT_MOCK;
       els.retry().addEventListener('click', () => { pingHealth(); loadProducts(); });
