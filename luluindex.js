@@ -128,3 +128,41 @@ app.use(cors({
   credentials: false              // keep false if you aren’t sending cookies
 }));
 app.options('*', cors());         // handle preflight for all routes
+// --- guaranteed health (already have this, keep it)
+app.all('/health', (_req, res) => res.status(200).send('ok'));
+
+// --- TEMP: list registered routes to debug
+app.get('/__routes', (_req, res) => {
+  const routes = [];
+  app._router.stack.forEach((m) => {
+    if (m.route && m.route.path) {
+      routes.push({ method: Object.keys(m.route.methods)[0].toUpperCase(), path: m.route.path });
+    } else if (m.name === 'router' && m.handle.stack) {
+      m.handle.stack.forEach((h) => {
+        if (h.route && h.route.path) {
+          routes.push({ method: Object.keys(h.route.methods)[0].toUpperCase(), path: h.route.path });
+        }
+      });
+    }
+  });
+  res.json({ routes });
+});
+
+// --- SAFE fallback /api/lulu/products (always returns mock if others missing)
+//     Keep your existing /api/lulu/products above this if you have it.
+//     This guard ensures there is *at least one* GET handler at that path.
+app.get('/api/lulu/products', async (_req, res, next) => {
+  // If another handler already sent a response, do nothing.
+  if (res.headersSent) return;
+  // If you already defined this route earlier in the file, comment this out.
+  try {
+    // Return mock so frontend keeps working while we sort the real one.
+    return res.json({
+      products: [
+        { id:'mock-tee-pink', title:'Lulu Pink Tee', price:19.99, image:'https://i.imgur.com/jXcGCKg.png', description:'Soft tee with strawberry sprinkles.' },
+        { id:'mock-romper-stars', title:'Star Romper', price:24.50, image:'https://i.imgur.com/WxA5W6K.png', description:'Comfy romper with twinkle stars.' }
+      ]
+    });
+  } catch (e) { return next(e); }
+});
+
