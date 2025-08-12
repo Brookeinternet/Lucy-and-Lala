@@ -17,16 +17,7 @@ const {
 } = process.env;
 
 import express from 'express';
-import cors from 'cors';
 
-// Allow any origin temporarily (no credentials). Remove after you confirm.
-app.use(cors({
-  origin: true,                   // reflect request origin
-  methods: ['GET','POST','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
-  credentials: false              // keep false if you aren’t sending cookies
-}));
-app.options('*', cors());         // handle preflight for all routes
 
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -127,3 +118,13 @@ app.post('/api/lulu/checkout', async (req, res) => {
 app.listen(PORT, () => console.log(`Lulu backend listening on :${PORT}`));
 
 export default app;
+import cors from 'cors';
+
+// Allow any origin temporarily (no credentials). Remove after you confirm.
+app.use(cors({
+  origin: true,                   // reflect request origin
+  methods: ['GET','POST','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  credentials: false              // keep false if you aren’t sending cookies
+}));
+app.options('*', cors());         // handle preflight for all routes
