@@ -25,6 +25,18 @@ import rateLimit from 'express-rate-limit';
 import fetch from 'node-fetch';
 
 const app = express();
+import express from 'express';
+import cors from 'cors'; // ✅ add this
+
+const app = express();
+
+// Allow all origins (or restrict to your frontend URL)
+app.use(cors({
+  origin: '*' // or: ['https://yourfrontend.com', 'http://localhost:3000']
+}));
+
+// ... your other middleware and routes
+
 
 // ------- Middleware -------
 const allowed = [FRONTEND_ORIGIN, 'http://localhost:3000', 'http://127.0.0.1:3000'].filter(Boolean);
