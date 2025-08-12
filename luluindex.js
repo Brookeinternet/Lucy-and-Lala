@@ -16,7 +16,7 @@ const {
   USE_MOCK = '0'
 } = process.env;
 
-import express from 'express';
+
 
 
 import helmet from 'helmet';
@@ -32,7 +32,7 @@ const app = express();
 
 // Allow all origins (or restrict to your frontend URL)
 app.use(cors({
-  origin: '*' // or: ['https://yourfrontend.com', 'http://localhost:3000']
+  origin: '*' // or: ['https://brookeinternet.github.io', 'http://localhost:3000']
 }));
 
 // ... your other middleware and routes
