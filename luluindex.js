@@ -28,7 +28,7 @@ const app = express();
 import express from 'express';
 import cors from 'cors'; // ✅ add this
 
-const app = express();
+
 
 // Allow all origins (or restrict to your frontend URL)
 app.use(cors({
