@@ -10,10 +10,10 @@ const {
   LULU_API_BASE_URL = 'https://api.printful.com',
   LULU_AUTH_SCHEME = 'Basic',       // Printful uses Basic <base64(apikey:)>
   LULU_API_KEY = 'JuWNtfNQsIW2OJdFMKd8OcBzYT2HWL3d12rmY1bb',                // <-- your Printful API key
-  LULU_PRODUCTS_SOURCE = 'store',   // 'store' | 'catalog'
+  LULU_PRODUCTS_SOURCE = 'store',   
 
   // Control live vs mock
-  USE_MOCK = '1'
+  USE_MOCK = '0'
 } = process.env;
 
 import express from 'express';
@@ -118,35 +118,19 @@ app.post('/api/lulu/checkout', async (req, res) => {
 app.listen(PORT, () => console.log(`Lulu backend listening on :${PORT}`));
 
 export default app;
+
+
 import cors from 'cors';
 
-// Allow any origin temporarily (no credentials). Remove after you confirm.
+// TEMP permissive CORS (reflects request origin). No credentials.
 app.use(cors({
-  origin: true,                   // reflect request origin
+  origin: true,
   methods: ['GET','POST','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization'],
-  credentials: false              // keep false if you aren’t sending cookies
+  credentials: false
 }));
-app.options('*', cors());         // handle preflight for all routes
-// --- guaranteed health (already have this, keep it)
-app.all('/health', (_req, res) => res.status(200).send('ok'));
+app.options('*', cors());
 
-// --- TEMP: list registered routes to debug
-app.get('/__routes', (_req, res) => {
-  const routes = [];
-  app._router.stack.forEach((m) => {
-    if (m.route && m.route.path) {
-      routes.push({ method: Object.keys(m.route.methods)[0].toUpperCase(), path: m.route.path });
-    } else if (m.name === 'router' && m.handle.stack) {
-      m.handle.stack.forEach((h) => {
-        if (h.route && h.route.path) {
-          routes.push({ method: Object.keys(h.route.methods)[0].toUpperCase(), path: h.route.path });
-        }
-      });
-    }
-  });
-  res.json({ routes });
-});
 
 // --- SAFE fallback /api/lulu/products (always returns mock if others missing)
 //     Keep your existing /api/lulu/products above this if you have it.
