@@ -18,6 +18,16 @@ const {
 
 import express from 'express';
 import cors from 'cors';
+
+// Allow any origin temporarily (no credentials). Remove after you confirm.
+app.use(cors({
+  origin: true,                   // reflect request origin
+  methods: ['GET','POST','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  credentials: false              // keep false if you aren’t sending cookies
+}));
+app.options('*', cors());         // handle preflight for all routes
+
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
