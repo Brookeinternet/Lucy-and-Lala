@@ -29,6 +29,7 @@
   "private": true
 }
 {
+  "private": true,
   "type": "module",
   "name": "lucy-and-lala",
   "version": "1.0.0",
@@ -48,3 +49,4 @@
     "express-rate-limit": "^7.0.0"
   }
 }
+
