@@ -33,6 +33,9 @@
   "name": "lucy-and-lala",
   "version": "1.0.0",
   "main": "luluindex.js",
+  "engines": {
+    "node": "22.5.1"
+  },
   "scripts": {
     "start": "node luluindex.js"
   },
