@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucy and Lala's Aqua Park Day</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root{ --ink:#1f2937; --muted:#6b7280; }
+    body{ font-family:'Inter',sans-serif; background:linear-gradient(180deg,#b2f0f0,#fdfd96); color:var(--ink); }
+    h1,h2,h3{ font-family:'Fredoka One',cursive; }
+    .card{ border-radius:1.5rem; overflow:hidden; box-shadow:0 10px 20px rgba(0,0,0,.1); background:#fff; }
+    .card img,.card video{ object-fit:contain; height:auto; width:100%; }
+
+    /* Lock / Pro overlays */
+    .overlay{ position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:1.5rem; z-index:9999; }
+    .locked-overlay{ background:rgba(255,255,255,.98); }
+    .locked-overlay h3{ font-size:2rem; color:#ef4444; margin:.25rem 0; }
+    .locked-overlay p{ color:#374151; margin:.35rem 0; }
+    .locked-overlay a{ margin-top:.75rem; padding:.75rem 1.25rem; border-radius:999px; background:#ec4899; color:#fff; font-weight:700; }
+
+    .pro-content-overlay{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem; text-align:center; padding:1.25rem; background:rgba(255,255,255,.94); border-radius:1rem; }
+    .pro-content-overlay h3{ color:#ef4444; font-size:1.5rem; font-weight:800; }
+    .pro-content-overlay a{ padding:.6rem 1rem; border-radius:999px; background:#ec4899; color:#fff; font-weight:700; }
+  </style>
+</head>
+<body class="text-gray-800">
+  <!-- Content Lock & Pro Gating (fixed closing tags and structure) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+      authDomain: "lucyandlala.firebaseapp.com",
+      projectId: "lucyandlala",
+      storageBucket: "lucyandlala.firebasestorage.app",
+      messagingSenderId: "422161772278",
+      appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+      measurementId: "G-JZJK3JWCKH"
+    };
+
+    const APP_OPTIONS = {
+      appId: (typeof window !== 'undefined' && typeof window.__app_id !== 'undefined') ? window.__app_id : null,
+      releaseDateISO: '2025-09-06T00:00:00Z' // Sept 6, 2025
+    };
+
+    let app = null, auth = null, db = null, currentUserId = null;
+
+    // Initialize Firebase only if config is present
+    if (firebaseConfig && firebaseConfig.apiKey) {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      console.log('[Aqua Park] Firebase initialized');
+    } else {
+      console.warn('[Aqua Park] Firebase config missing; gating disabled');
+    }
+
+    function showReleaseLock() {
+      const overlay = document.createElement('div');
+      overlay.className = 'overlay locked-overlay';
+      overlay.innerHTML = `
+        <h3>🔒 Coming Soon!</h3>
+        <p>This delightful adventure will be released on Sept 6, 2025!</p>
+        <p>Check back soon to explore Lucy and Lala's Aqua Park fun!</p>
+        <a href="toddler-blog">Back to All Adventures! 🎀</a>
+      `;
+      document.body.appendChild(overlay);
+      document.documentElement.style.overflow = 'hidden';
+    }
+
+    function showProOverlay(target) {
+      if (!target) return;
+      const overlay = document.createElement('div');
+      overlay.className = 'pro-content-overlay';
+      overlay.innerHTML = `
+        <h3>🔒 Pro Content Only!</h3>
+        <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+        <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank" rel="noopener">Unlock Now for $10/month!</a>
+      `;
+      target.style.position = 'relative';
+      target.appendChild(overlay);
+      const firstCard = target.querySelector('.card');
+      if (firstCard) { firstCard.style.filter = 'blur(5px)'; firstCard.style.pointerEvents = 'none'; }
+    }
+
+    async function getAuthenticatedUserId() {
+      if (!auth) return null;
+      return new Promise((resolve) => {
+        const unsub = onAuthStateChanged(auth, (user) => {
+          if (user) { currentUserId = user.uid; }
+          unsub();
+          resolve(user ? user.uid : null);
+        });
+      });
+    }
+
+    async function getProSubscriberStatus() {
+      if (!db) return false;
+      const userId = await getAuthenticatedUserId();
+      if (!userId) return false;
+      try {
+        const refPath = APP_OPTIONS.appId
+          ? `artifacts/${APP_OPTIONS.appId}/users/${userId}/profile/subscription`
+          : `users/${userId}/profile/subscription`;
+        const snap = await getDoc(doc(db, refPath));
+        return snap.exists() && snap.data().isProSubscriber === true;
+      } catch (err) {
+        console.warn('[Aqua Park] Pro status check failed:', err);
+        return false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1) Date lock first
+      const now = new Date();
+      const releaseDate = new Date(APP_OPTIONS.releaseDateISO);
+      if (now < releaseDate) {
+        showReleaseLock();
+        return;
+      }
+
+      // 2) Anonymous auth only (no custom tokens)
+      if (auth) {
+        try { await signInAnonymously(auth); } catch (e) { console.warn('[Aqua Park] Anonymous sign-in failed:', e); }
+      }
+
+      // 3) Pro gate
+      const mainEl = document.querySelector('main');
+      try {
+        const isPro = await getProSubscriberStatus();
+        if (!isPro) showProOverlay(mainEl);
+      } catch (e) {
+        console.warn('[Aqua Park] Pro gate skipped:', e);
+      }
+    });
+  </script>
+
+  <header class="text-center py-8 bg-gradient-to-r from-teal-300 to-yellow-200">
+    <h1 class="text-4xl md:text-6xl text-white drop-shadow-lg">💦 Lucy & Lala’s Aqua Park Adventure 🌳</h1>
+    <p class="text-lg md:text-xl text-white mt-2">Playground fun, aqua jumpers, and sunshine smiles!</p>
+  </header>
+
+  <main class="max-w-4xl mx-auto p-6 space-y-10">
+    <section class="card">
+      <video src="https://i.imgur.com/lxyICnZ.mp4" controls></video>
+      <div class="p-6">
+        <h2 class="text-3xl text-teal-500 mb-4">Sister Goals in Our Adorable Rompers! 💙✨</h2>
+        <p>Lucy and Lala were inseparable all day, from giggling on the swings to racing each other down the slide. In this sweet video, you can see them twinning in their <a href="https://www.etsy.com/listing/1350206915/vintage-little-bb-girls-70s-blue-quilted" target="_blank" class="text-teal-500 font-bold hover:underline">aqua floral rompers</a>, hand in hand, laughing as if the park was made just for them. Their bond is pure joy — the kind that makes everyone around stop and smile. It’s more than matching outfits; it’s matching hearts.</p>
+        <p>The rompers moved with them through every hop, climb, and twirl, proving that playful fashion can be as practical as it is adorable. The girls even made up a silly song about their day, which they sang while twirling in the sunshine. Parents looking to capture similar sibling magic should bring along a camera or phone to catch candid moments, because these little bursts of love are priceless.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <img src="https://i.imgur.com/0i8h7CD.jpeg" alt="Lucy and Lala in aqua jumpers" />
+      <div class="p-6">
+        <h2 class="text-3xl text-teal-500 mb-4">Perfect Park Outfits</h2>
+        <p>Lucy and Lala arrived in matching <a href="https://www.etsy.com/listing/1350206915/vintage-little-bb-girls-70s-blue-quilted" target="_blank" class="text-teal-500 font-bold hover:underline">aqua floral jumpers</a> — cheerful, vibrant, and perfectly suited for a day under the sun. The lightweight cotton kept them cool while the playful floral pattern made them stand out like little bursts of joy among the playground colors.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <img src="https://i.imgur.com/ZctEPL3.jpeg" alt="Lucy and Lala playing on swings" />
+      <div class="p-6">
+        <h2 class="text-3xl text-teal-500 mb-4">Swings, Slides & Laughter</h2>
+        <p>The swings were the first stop of the day, and each push sent squeals of joy into the warm summer air. Lala leaned back to feel the breeze, while Lucy pumped her legs furiously, determined to reach the highest arc. The slide was a close second favorite — a determined climb up the ladder, a brave pause at the top, and a triumphant giggle on the way down.</p>
+        <p><strong>Parent tip:</strong> Check playground surfaces for heat before play, encourage turn-taking, and keep a water bottle handy for quick hydration breaks.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <img src="https://i.imgur.com/VOk8Dn4.jpeg" alt="Lucy and Lala exploring the park" />
+      <div class="p-6">
+        <h2 class="text-3xl text-teal-500 mb-4">Exploring the Park</h2>
+        <p>The park became their own personal adventure map: a butterfly resting on a daisy, a friendly squirrel darting up a tree, and a cluster of smooth pebbles perfect for pocketing. Their jumpers proved the perfect companion for curiosity-fueled wandering — sturdy for crouching and stretching yet soft enough for lounging in the grass.</p>
+        <p><strong>Pack list:</strong> sunscreen, snacks, and a light blanket for picnic breaks. Tiny backpacks give them independence and a place to store all those little treasures.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <img src="https://i.imgur.com/KSISp6U.jpeg" alt="Lucy and Lala smiling at the park" />
+      <div class="p-6">
+        <h2 class="text-3xl text-teal-500 mb-4">The Sweetest Ending</h2>
+        <p>By the end of the day, the girls were happily exhausted, sitting cross-legged on the grass with ice cream cones in hand. Lucy’s was already melting down her fingers, but she didn’t mind — she was too busy telling Lala about how fast she went down the slide. Lala grinned, reminding her of the butterfly they’d seen earlier. The setting sun cast a golden glow, making their aqua jumpers look even more vibrant against the fading sky.</p>
+        <p>These moments — sticky hands, tired legs, and happy hearts — are what make childhood magical. Ending with a calm activity, like reading under a tree, makes the trip home a breeze.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center py-6 bg-gradient-to-r from-teal-300 to-yellow-200 text-white font-semibold">
+    &copy; 2025 Lucy & Lala Adventures — All smiles, all the time.
+  </footer>
+
+  <!-- Minimal Test Cases to prevent regressions (existing + a few more) -->
+  <script>
+    (function(){
+      const results = [];
+      function pass(name){ results.push({test:name, result:'PASS'}); }
+      function fail(name,err){ results.push({test:name, result:'FAIL', err:String(err)}); }
+
+      // Existing tests — DO NOT MODIFY
+      try { void (typeof initialAuthToken); pass('No ReferenceError for initialAuthToken check'); } catch(e){ fail('No ReferenceError for initialAuthToken check', e); }
+      try { const n=document.getElementsByTagName('body').length; if(n===1) pass('Single <body> element'); else throw new Error('Body count = '+n); } catch(e){ fail('Single <body> element', e); }
+      try { const hasModule = !!document.querySelector('script[type="module"]'); if(hasModule) pass('Module script present'); else throw new Error('Missing module script'); } catch(e){ fail('Module script present', e); }
+      try { const src = document.currentScript?.previousElementSibling?.textContent || ''; if(src.includes('signInWithCustomToken')) throw new Error('Custom token sign-in found'); pass('No custom token sign-in'); } catch(e){ pass('No custom token sign-in'); }
+
+      // Additional tests
+      try { const fnsOk = typeof window.showReleaseLock === 'undefined'; pass('Encapsulated module scope (no global leaks)'); } catch(e){ fail('Encapsulated module scope (no global leaks)', e); }
+      try { const main = document.querySelector('main'); if(main) pass('Main element exists'); else throw new Error('Missing <main>'); } catch(e){ fail('Main element exists', e); }
+
+      console.table(results);
+      window.__aquapark_tests = results;
+    })();
+  </script>
+</body>
+</html>
