@@ -6,7 +6,7 @@
   "type": "module",
   "main": "luluindex.js",
   "engines": {
-    "node": "22.5.1"
+    "node": "22.x"
   },
   "scripts": {
     "lint": "eslint .",
@@ -20,11 +20,12 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^4.18.2",
+    "express-rate-limit": "^8.0.1",
+    "firebase-admin": "^13.4.0",
+    "firebase-functions": "^6.4.0",
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
-    "express-rate-limit": "^8.0.1",
-    "firebase-admin": "^12.6.0",
-    "firebase-functions": "^6.0.1"
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "eslint": "^8.15.0",
