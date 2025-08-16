@@ -26,7 +26,7 @@ app.listen(PORT, () => {
 
 // Pull env vars directly from process.env (Render sets these automatically)
 const {
-  PORT = 3000,
+
   NODE_ENV = 'development',
   FRONTEND_ORIGIN = 'https://<https://brookeinternet.github.io',
 
