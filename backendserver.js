@@ -31,7 +31,7 @@ const db = admin.firestore();
 const PRO_SUBSCRIPTION_PRICE_ID = 'price_1Ro7rMReyOAsAwqJwRz0TYwd';
 const SWEET_ROLL_PRODUCT_PRICE_ID = 'price_1Ro7tKReyOAsAwqJDgaezn5Q';
 const DONUT_PRODUCT_PRICE_ID = 'price_1Ro7toReyOAsAwqJXl7LoSwU';
-
+const  Lucy_and_Lala_Holiday_Users= price_1RwptoReyOAsAwqJVa68WsmQ
 // Your Firebase App ID (used for Firestore collection paths)
 
 
