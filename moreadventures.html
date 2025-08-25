@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upcoming Adventures - Lucy and Lala</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">  
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color:#fff0f5; display:flex; flex-direction:column; align-items:center; min-height:100vh; padding-bottom:3rem; }
+    h1, h2 { font-family: 'Fredoka', 'Inter', sans-serif; }
+    .container { max-width:900px; width:100%; }
+    .header-bg { background-image:linear-gradient(135deg, #fde1f1, #fbcfe8 40%, #f9a8d4 100%); text-shadow:2px 2px 4px rgba(0,0,0,.08); }
+    h1 { font-weight:900; letter-spacing:.5px; }
+    h2 { font-weight:800; }
+    .text-cutesy-pink { color:#ff85a2; }
+
+    .articles-list-callout { background-image:linear-gradient(120deg, #a78bfa, #c4b5fd); color:#fff; border-radius:1.5rem; padding:1.5rem 2rem; box-shadow:0 8px 16px rgba(0,0,0,.12); text-align:center; margin-top:2rem; margin-bottom:2rem; }
+    .articles-list { list-style:none; padding:0; margin-top:1.5rem; display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; }
+    .articles-list li { width:calc(50% - 0.75rem); max-width:350px; background-color:rgba(255,255,255,.22); border-radius:1rem; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,.08); opacity:.9; position:relative; }
+    .article-card { display:flex; flex-direction:column; align-items:center; padding:1rem; color:#fff; font-weight:600; font-size:1rem; height:100%; cursor:not-allowed; user-select:none; text-decoration:none; }
+    .article-thumbnail { width:100%; height:220px; object-fit:cover; border-radius:.75rem; margin-bottom:.75rem; border:2px solid rgba(255,255,255,.5); }
+    .release-date { font-size:.875rem; color:rgba(255,255,255,.9); margin-top:.25rem; }
+    .badge-soon { position:absolute; top:.75rem; left:.75rem; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); padding:.25rem .5rem; border-radius:.5rem; font-size:.75rem; font-weight:700; }
+
+    .holiday-callout { background-image:linear-gradient(135deg, #34d399, #10b981 40%, #22c55e 100%); color:#064e3b; border-radius:1.5rem; padding:1.75rem 2rem; box-shadow:0 10px 18px rgba(0,0,0,.12); text-align:center; margin-top:2rem; margin-bottom:2rem; }
+    .holiday-callout h2 { color:#ffffff; text-shadow:0 2px 8px rgba(0,0,0,.15); }
+    .holiday-sub { color:#eafff3; }
+    .holiday-list li { background:linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,.18)); }
+    .badge-lock { position:absolute; top:.75rem; right:.75rem; background:#064e3b; color:#ecfdf5; padding:.25rem .5rem; border-radius:.5rem; font-size:.75rem; font-weight:800; display:flex; align-items:center; gap:.35rem; }
+    .cta-btn { display:inline-block; background:#ffffff; color:#059669; font-weight:800; padding:.85rem 1.25rem; border-radius:9999px; border:2px solid #ecfdf5; transition:transform .15s ease, box-shadow .2s ease; }
+    .cta-btn:hover { transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,.15); }
+
+    .btn-back { background:#ff85a2; color:#fff; transition:.3s; transform:translateY(0); border:2px solid #fff; padding:.75rem 1.5rem; border-radius:9999px; font-weight:bold; margin-top:2rem; }
+    .btn-back:hover { background:#ff6b8f; transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,.2); }
+    @media (max-width:640px){ .articles-list li{ width:100%; } }
+  </style>
+</head>
+<body class="antialiased text-gray-600">
+  <div class="min-h-screen flex flex-col items-center py-8 px-4">
+    <header class="w-full container mx-auto text-center mb-12">
+      <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+        <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">🗓️ Coming Soon: More Adventures! ✨</h1>
+        <p class="text-xl md:text-2xl text-pink-800 font-semibold">Get ready for new stories from Lucy and Lala! 💖</p>
+      </div>
+    </header>
+
+    <!-- Future Fun -->
+    <section class="w-full container mx-auto articles-list-callout">
+      <h2 class="text-4xl font-extrabold mb-3 drop-shadow-sm">Sneak Peek: Future Fun! 🚀</h2>
+      <ul class="articles-list" aria-live="polite">
+       <li>
+          <div class="badge-soon" aria-hidden="true">Coming Soon</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0" title="Coming October 1">
+            <img loading="lazy" src="https://placehold.co/350x220/c4b5fd/ffffff?text=Critter+Kitchen" alt="Critter Kitchen Chaos preview image" class="article-thumbnail">
+            <span>🐰 Critter Kitchen Chaos!</span>
+            <span class="release-date">Coming: October 1</span>
+          </div>
+        </li>
+
+        <li>
+          <div class="badge-soon" aria-hidden="true">Coming Soon</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0" title="Coming October 15">
+            <img loading="lazy" src="https://i.imgur.com/xgPNFzm.jpeg" alt="Five Below Fun preview image" class=/"article-thumbnail">
+            <span>🛍️ Five Below Fun!</span>
+            <span class="release-date">Coming: October 15</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="badge-soon">Coming Soon</div><div class="article-card"><img src="https://placehold.co/350x220/fcd34d/1f2937?text=ITSUGAR" class="article-thumbnail" alt="It'Sugar"><span>🍭 It'Sugar Fun!</span><span class="release-date">Coming: November 7</span></div></li>
+        
+        <li>
+          <div class="badge-soon">Coming Soon</div><div class="article-card"><img src="https://placehold.co/350x220/fde68a/1f2937?text=Barnes+%26+Noble" class="article-thumbnail" alt="Barnes & Noble"><span>📚 Barnes & Noble Fun!</span><span class="release-date">Coming: November 14</span></div></li>
+        
+        <li> 
+          <div class="badge-soon" aria-hidden="true"Coming Soon</div>
+          <div class="article-card" role="link" aria-disabled="true\" tabindex="0" title="Coming October 22">
+            <img loading="lazy" src="https://i.imgur.com/ByVJlhL.jpeg" alt="Daddy and Lala mall trip preview image" 
+            <span>🛒 Daddy & Lala Mall Trip!</span>
+            <span class="release-date">Coming: October 22</span>
+          </div>
+        </li>
+
+        <li>
+          <div class="badge-soon" aria-hidden="true">Coming Soon</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0\" title="Coming October 29\">
+            <img loading="lazy" src="https://i.imgur.com/Sft1bRD.jpeg" alt="Plush Etsy Cat preview image" class=\"article-thumbnail\">
+            <span>🐱 Plush Etsy Cat!</span>
+            <span class="release-date">Coming: October 29</span>
+              <li>
+          <div class="badge-soon" aria-hidden="true">Coming Soon</div>
+          <div class="article-card" role="link" <a href="butterball.html"aria-disabled="true" tabindex="0" title="Coming October 7\">
+            <img loading="lazy" src="https://i.imgur.com/1pQuoee.jpeg" alt="Meet Butterball preview image\" class=\"article-thumbnail\">
+            <span>🐾 Meet Butterball!</span>
+            <span class="release-date">Coming: October 7</span>
+          </div>
+        </li>
+          </div>
+        </li>
+        
+      </ul>
+    </section>
+
+    <!-- Holiday-only -->
+    <section class="w-full container mx-auto holiday-callout">
+      <h2 class="text-4xl font-extrabold mb-2 drop-shadow-sm">🎁 Holiday Magic Collection</h2>
+      <p class="holiday-sub">$12.99/mo plan required.</p>
+      <a href="https://buy.stripe.com/aFa00lfBKdokcsN7t0abK03" target="_blank" class="cta-btn">Unlock Holiday Magic</a>
+      <div id="holiday-addon" class="hidden">
+        <p class="holiday-sub mt-4">Already a Pro? Add Holiday Plan for just $2 more!</p>
+        <a href="https://buy.stripe.com/aFa28t0GQdok64p6oWabK04" target="_blank" class="cta-btn">Add Holiday Add-on $2</a>
+      </div>
+      <ul class="articles-list holiday-list">
+         <li>
+          <div class="badge-lock" aria-hidden="true">🔒 PRO</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0" title="Spirit Halloween Adventure (locked)">
+            <img loading="lazy" src="https://i.imgur.com/ZDSMoqZ.jpeg" alt="Spirit Halloween Adventure preview" class="article-thumbnail">
+            <span>👻 Spirit Halloween Adventure!</span>
+            <span class="release-date">October 5 (Holiday Exclusive)</span>
+          </div>
+        </li>
+        <li>
+          <div class="badge-lock" aria-hidden="true">🔒 PRO</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0" title="Digital Spooks (locked)">
+            <img loading="lazy" src="https://i.imgur.com/0F82nbh.jpeg" alt="Digital Spooks preview" class="article-thumbnail">
+            <span>🕹️ Digital Spooks!</span>
+            <span class="release-date">October 15 (Holiday Exclusive)</span>
+          </div>
+        </li>
+        <li><div class="badge-lock">🔒 PRO</div><div class="article-card"><img src="https://placehold.co/350x220/ef4444/ffffff?text=Trick+or+Treating" class="article-thumbnail"><span>🍬 Trick or Treating!</span><span class="release-date">October 31</span></div></li>
+        <li><div class="badge-lock">🔒 PRO</div><div class="article-card"><img src="https://placehold.co/350x220/111827/ffffff?text=Tiny+Game+Big+Energy" class="article-thumbnail"><span>🎮 Tiny Game, Big Energy!</span><span class="release-date">November 3</span></div></li>
+      <li>
+          <div class="badge-soon" aria-hidden="true">Coming Soon</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0" title="Coming October 5">
+            <img loading="lazy" src="https://placehold.co/350x220/a78bfa/ffffff?text=Fall+Festival" alt="Fall Festival Fun preview image" class="article-thumbnail">
+            <span>🍂 Fall Festival Fun!</span>
+            <span class="release-date">Coming: October 5</span>
+          </div>
+        </li>
+ <li>
+          <div class="badge-soon" aria-hidden="true">Coming Soon</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0" title="Coming November 15">
+            <img loading="lazy" src="https://placehold.co/350x220/7c3aed/ffffff?text=Thanksgiving+Feast" alt="Thanksgiving Feast Prep preview image" class="article-thumbnail">
+            <span>🦃 Thanksgiving Feast Prep!</span>
+            <span class="release-date">Coming: November 15</span>
+          </div>
+        </li>
+ <li>
+          <div class="badge-soon" aria-hidden="true">Coming Soon</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0" title="Coming November 15">
+            <img loading="lazy" src="https://placehold.co/350x220/7c3aed/ffffff?text=Thanksgiving+Feast" alt="Thanksgiving Feast Prep preview image" class="article-thumbnail">
+            <span>🦃 Thanksgiving Feast Prep!</span>
+            <span class="release-date">Coming: November 15</span>
+          </div>
+        </li>
+
+        <li>
+          <div class="badge-soon" aria-hidden="true">Coming Soon</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0" title="Coming December 10">
+            <img loading="lazy" src="https://placehold.co/350x220/6d28d9/ffffff?text=Winter+Wonderland" alt="Winter Wonderland Play preview image" class="article-thumbnail">
+            <span>❄️ Winter Wonderland Play!</span>
+            <span class="release-date">Coming: December 10</span>
+          </div>
+        </li>
+        <li>
+          <
+        <li>
+          <div class="badge-soon" aria-hidden="true">Coming Soon</div>
+          <div class="article-card" role="link" aria-disabled="true" tabindex="0" title="Coming October 20">
+            <img loading="lazy" src="https://placehold.co/350x220/8b5cf6/ffffff?text=Halloween+Costumes" alt="Spooky Halloween Costumes preview image" class="article-thumbnail">
+            <span>🎃 Spooky Halloween Costumes!</span>
+            <span class="release-date">Coming: October 20</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Recipes -->
+    <section class="w-full container mx-auto mt-10">
+      <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">🍓 Recipes & Food</h2>
+      <ul class="articles-list">
+        <li><div class="article-card"><img src="https://placehold.co/350x220/fcd34d/1f2937?text=Peaches+in+Park" class="article-thumbnail"><span>🍑 Peaches in Park</span><span class="release-date">October 14</span></div></li>
+        <li><div class="article-card"><img src="https://placehold.co/350x220/f87171/ffffff?text=%25Pizza" class="article-thumbnail"><span>🍕 %Pizza</span><span class="release-date">October 29</span></div></li>
+      </ul>
+    </section>
+
+    <!-- Books -->
+    <section class="w-full container mx-auto mt-10">
+      <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">📖 Lucy & Lala Books</h2>
+      <ul class="articles-list">
+        <li><div class="article-card"><img src="https://placehold.co/350x220/93c5fd/1f2937?text=Beyonce" class="article-thumbnail"><span>🌟 Beyonce - Little People, Big Dreams Review</span><span class="release-date">October 21</span></div></li>
+        <li><div class="article-card"><img src="https://placehold.co/350x220/f9a8d4/1f2937?text=Dolly+Parton" class="article-thumbnail"><span>🎤 Dolly Parton - Little People, Big Dreams Review</span><span class="release-date">October 21</span></div></li>
+      </ul>
+    </section>
+  </div>
+
+   <!-- About Section -->
+    <section class="w-full container mx-auto mt-12 bg-white shadow-md rounded-3xl p-8">
+      <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">👧 About Lucy & Lala</h2>
+      <p class="text-lg text-gray-700 leading-relaxed">Lucy and Lala are two best friends who explore the world with giggles, creativity, and kindness. Whether they’re at the arcade, baking treats, or going on magical holiday adventures, they always remind us that childhood is full of
+ <div class="article-card bg-yellow-400 text-white">
+        <img src="https://placehold.co/350x220/ffb6c1/ffffff?text=Lucy" alt="About Lucy" class="article-thumbnail">
+            🌈 About Lucy
+          </div>
+        </li>
+        <li>
+          <div class="article-card bg-yellow-400 text-white">
+             <div class="article-card bg-yellow-400 text-white">
+            <img src="https://i.imgur.com/2hF6eFD.jpeg" alt=" About Lala" class="/article-thumbnail">
+            About Lala
+          </div>
+        </li>
+ </ul>
+
+  <script>
+    // Example logic: only show the $2 add-on if user is Pro
+    const isProUser = false; // Replace with real check from your auth system
+    if(isProUser){
+      document.getElementById('holiday-addon').classList.remove('hidden');
+    }
+     <script src="https://js.stripe.com/v3/"></script>
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Initialize Stripe.js with your publishable key
+        const stripe = Stripe('pk_live_51Ro7nNReyOAsAwqJH3XMcYCu0yYudEZ4sDCQfUfYLe7ECg4jRslHvnMX5WOIx7c7wfSxkSNwJrBeKnF9KnDyAoXR00eyCtYQGI');
+
+
+        // Global variables for Firebase config and app ID
+       const firebaseConfig = {
+    apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+    authDomain: "lucyandlala.firebaseapp.com",
+    projectId: "lucyandlala",
+    storageBucket: "lucyandlala.firebasestorage.app",
+    messagingSenderId: "422161772278",
+    appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+    measurementId: "G-JZJK3JWCKH"
+};
+
+        // Initialize Firebase
+        let app = null;
+        let auth = null;
+        let db = null;
+        let authInitialized = false;
+
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            authInitialized = true;
+        } else {
+            console.warn("Firebase config not found or invalid. Authentication features will not be available.");
+            // Hide auth UI if Firebase is not configured
+            document.getElementById('auth-container').classList.add('hidden');
+        }
+
+        let currentUserId = null;
+
+        // Auth UI Elements
+        const authContainer = document.getElementById('auth-container');
+        const authStatusDiv = document.getElementById('auth-status');
+        const authFormContainer = document.getElementById('auth-form-container');
+        const authMessage = document.getElementById('auth-message');
+        const userIdDisplay = document.getElementById('user-id');
+        const signOutButton = document.getElementById('sign-out-button');
+        const authErrorMessage = document.getElementById('auth-error-message');
+
+        // Forms and their toggles
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
+        const showSignupLink = document.getElementById('show-signup');
+        const showLoginLink = document.getElementById('show-login');
+        const showForgotPasswordLink = document.getElementById('show-forgot-password');
+        const backToLoginLink = document.getElementById('back-to-login');
+
+        // Input fields
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        const signupEmailInput = document.getElementById('signup-email');
+        const signupPasswordInput = document.getElementById('signup-password');
+        const resetEmailInput = document.getElementById('reset-email');
+
+        // --- Helper Functions for UI Toggling ---
+        function showForm(formToShow) {
+            if (loginForm) loginForm.classList.add('hidden');
+            if (signupForm) signupForm.classList.add('hidden');
+            if (forgotPasswordForm) forgotPasswordForm.classList.add('hidden');
+            if (authErrorMessage) authErrorMessage.textContent = '';
+            if (formToShow) formToShow.classList.remove('hidden');
+        }
+
+        // --- Firebase Auth Functions ---
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            if (!authInitialized || !db || !currentUserId) return false;
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+                return docSnap.exists() && docSnap.data().isProSubscriber === true;
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
+        // Function to update UI based on auth state
+        async function updateAuthUI(user) {
+            if (user) {
+                if (authContainer) authContainer.classList.add('hidden'); // Hide the entire auth container when signed in
+            } else {
+                if (authContainer) authContainer.classList.remove('hidden'); // Show the container when signed out
+            }
+            if (authStatusDiv) authStatusDiv.classList.toggle('hidden', !user); // Show status div if user exists
+            if (authFormContainer) authFormContainer.classList.toggle('hidden', !!user); // Show form container if user does NOT exist
+
+            if (user) {
+                if (authMessage) authMessage.textContent = 'You are signed in!';
+                if (userIdDisplay) userIdDisplay.textContent = `User ID: ${user.uid}`;
+                await updateProStatusUI();
+            } else {
+                if (authMessage) authMessage.textContent = ''; // Clear previous messages
+                if (userIdDisplay) userIdDisplay.textContent = '';
+                showForm(loginForm); // Show login form by default
+            }
+            // Once auth state is determined, hide the loading overlay
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+        }
+
+        // Function to update Pro Status UI (reads from Firestore)
+        async function updateProStatusUI() {
+            const isProSubscriber = await getProSubscriberStatus();
+            const articleLinks = document.querySelectorAll('.articles-list a');
+            articleLinks.forEach(link => {
+                let proBadge = link.querySelector('.pro-badge');
+                if (link.dataset.pro === 'true') {
+                    if (!proBadge) {
+                        const span = document.createElement('span');
+                        span.className = 'pro-badge';
+                        span.textContent = 'PRO';
+                        link.querySelector('span:not(.release-date)').appendChild(span);
+                    }
+                } else {
+                    if (proBadge) {
+                        proBadge.remove();
+                    }
+                }
+            });
+        }
+
+        // --- Event Listeners for Forms ---
+        if (authInitialized) {
+            if (showSignupLink) showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
+            if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+            if (showForgotPasswordLink) showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
+            if (backToLoginLink) backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+
+            if (loginForm) loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = loginEmailInput.value;
+                const password = loginPasswordInput.value;
+                if (authErrorMessage) authErrorMessage.textContent = '';
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    alert('Successfully logged in!');
+                } catch (error) {
+                    console.error("Login error:", error);
+                    if (authErrorMessage) authErrorMessage.textContent = error.message;
+                }
+            });
+
+            if (signupForm) signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = signupEmailInput.value;
+                const password = signupPasswordInput.value;
+                if (authErrorMessage) authErrorMessage.textContent = '';
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    alert('Account created successfully! You are now logged in.');
+                } catch (error) {
+                    console.error("Sign up error:", error);
+                    if (authErrorMessage) authErrorMessage.textContent = error.message;
+                }
+            });
+
+            if (forgotPasswordForm) forgotPasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = resetEmailInput.value;
+                if (authErrorMessage) authErrorMessage.textContent = '';
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert('Password reset email sent! Check your inbox.');
+                    showForm(loginForm);
+                } catch (error) {
+                    console.error("Password reset error:", error);
+                    if (authErrorMessage) authErrorMessage.textContent = error.message;
+                }
+            });
+
+            if (signOutButton) signOutButton.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    alert('You have been signed out.');
+                } catch (error) {
+                    console.error("Error signing out:", error);
+                    alert('Error signing out. Please try again.');
+                }
+            });
+
+            document.querySelectorAll('.articles-list a').forEach(link => {
+                link.addEventListener('click', async function(event) {
+                    const isProArticle = this.dataset.pro === 'true';
+                    const isUserPro = await getProSubscriberStatus();
+                    if (isProArticle && !isUserPro) {
+                        event.preventDefault();
+                        alert('This content is for Pro Subscribers only! Please subscribe to unlock.');
+                        window.open('https://buy.stripe.com/eVq00ldtC8408cxfZwabK00', '_blank');
+                    }
+                });
+            });
+        }
+        
+        // Initial Auth State Check
+        if (authInitialized) {
+            onAuthStateChanged(auth, (user) => {
+                currentUserId = user ? user.uid : null;
+                updateAuthUI(user);
+            });
+        } else {
+            // Hide the loading overlay and show a message if auth is not initialized
+            document.getElementById('loading-overlay').classList.add('hidden');
+            const authSection = document.getElementById('auth-section');
+            if (authSection) {
+                 authSection.innerHTML = `
+                    <div class="auth-form-container">
+                        <p class="text-red-600 font-bold">Authentication is unavailable.</p>
+                        <p class="text-sm">Please try again later or contact support.</p>
+                    </div>
+                `;
+                 authSection.classList.remove('hidden');
+            }
+        }
+    </script>
+  
+</body>
+</html>
