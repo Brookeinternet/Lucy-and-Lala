@@ -234,6 +234,11 @@
 
     <!-- Recipes -->
     <section class="w-full container mx-auto mt-10">
+   
+      <div id="holiday-addon" class="hidden">
+        <p class="holiday-sub mt-4">Already a Pro? Add Food and Recipes Plan for just $2 more!</p>
+        <a href="https://buy.stripe.com/dRm14pfBKdokboJcNkabK05" target="_blank" class="cta-btn">Add Holiday Add-on $2</a>
+      </div>
       <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">🍓 Recipes & Food</h2>
       <ul class="articles-list">
         <li><div class="article-card"><img src="https://placehold.co/350x220/fcd34d/1f2937?text=Peaches+in+Park" class="article-thumbnail"><span>🍑 Peaches in Park</span><span class="release-date">October 14</span></div></li>
@@ -245,6 +250,10 @@
     <section class="w-full container mx-auto mt-10">
       <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">📖 Lucy & Lala Books</h2>
       <ul class="articles-list">
+        <div id="holiday-addon" class="hidden">
+        <p class="holiday-sub mt-4">Already a Pro? Add  Lucy and Lala Books Plan for just $2 more!</p>
+        <a href=" https://buy.stripe.com/cNi6oJ2OY840eAVbJgabK06" target="_blank" class="cta-btn">Add  Books With Lucy and Lala Add-on $2</a>
+       
         <li><div class="article-card"><img src="https://placehold.co/350x220/93c5fd/1f2937?text=Beyonce" class="article-thumbnail"><span>🌟 Beyonce - Little People, Big Dreams Review</span><span class="release-date">October 21</span></div></li>
         <li><div class="article-card"><img src="https://placehold.co/350x220/f9a8d4/1f2937?text=Dolly+Parton" class="article-thumbnail"><span>🎤 Dolly Parton - Little People, Big Dreams Review</span><span class="release-date">October 21</span></div></li>
       </ul>
@@ -254,7 +263,7 @@
    <!-- About Section -->
     <section class="w-full container mx-auto mt-12 bg-white shadow-md rounded-3xl p-8">
       <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">👧 About Lucy & Lala</h2>
-      <p class="text-lg text-gray-700 leading-relaxed">Lucy and Lala are two best friends who explore the world with giggles, creativity, and kindness. Whether they’re at the arcade, baking treats, or going on magical holiday adventures, they always remind us that childhood is full of
+      <p class="text-lg text-gray-700 leading-relaxed">Lucy and Lala are two twins who explore the world with giggles, creativity, and kindness. Whether they’re at the arcade, baking treats, or going on magical holiday adventures, they always remind us that childhood is full of greatness.
  <div class="article-card bg-yellow-400 text-white"> <a href="lucy.html">Visit Lucy article</a>
         <img src="https://i.imgur.com/AGFLoQt.jpeg" alt="About Lucy" 
             🌈 About Lucy
@@ -270,7 +279,7 @@
  </ul>
 
   <script>
-    // Example logic: only show the $2 add-on if user is Pro
+    // Example logic: only show the $2 add-on (Holiday, Food and Recipes,Books) if user is Pro
     const isProUser = false; // Replace with real check from your auth system
     if(isProUser){
       document.getElementById('holiday-addon').classList.remove('hidden');
