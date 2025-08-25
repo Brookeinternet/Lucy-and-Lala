@@ -31,7 +31,10 @@ const db = admin.firestore();
 const PRO_SUBSCRIPTION_PRICE_ID = 'price_1Ro7rMReyOAsAwqJwRz0TYwd';
 const SWEET_ROLL_PRODUCT_PRICE_ID = 'price_1Ro7tKReyOAsAwqJDgaezn5Q';
 const DONUT_PRODUCT_PRICE_ID = 'price_1Ro7toReyOAsAwqJXl7LoSwU';
-const  Lucy_and_Lala_Holiday_Users= price_1RwptoReyOAsAwqJVa68WsmQ
+const  Lucy_and_Lala_Holiday_Users= "price_1RwptoReyOAsAwqJVa68WsmQ" ;
+const Holiday_Add_on_For_Pro_Users = "price_1RzH4OReyOAsAwqJqvNmXSNs" ;
+const Food_on_for_Pro_Users  = "price_1S03beReyOAsAwqJy87wVihM" ; 
+const Books With Lucy and Lala Add on for Pro Users = "price_1S03dDReyOAsAwqJ3MVG1v3k" ;
 // Your Firebase App ID (used for Firestore collection paths)
 
 
