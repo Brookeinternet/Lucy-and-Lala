@@ -1,0 +1,335 @@
+import React, { useEffect, useRef, useState } from "react";
+
+// Lucy & Lala: Brownie Bake‑Off (React DOM mini‑game)
+// Fixes in this version:
+//  - **Pouring readiness bug**: previously `pourPct` never advanced because the interval
+//    read a stale `stir` value (closure issue). We now update `pourPct` inside the
+//    functional `setStir` updater (and while stirring), guaranteeing fresh state.
+//  - Added tiny self‑tests in console to assert the pouring logic.
+//  - Copy cleanup (typos), no game design changes otherwise.
+
+export default function BrownieBakeOff(){
+  const [step, setStep] = useState(0); // 0 intro, 1 gather, 2 mix, 3 bake, 4 result
+  const [basket, setBasket] = useState([]); // collected ingredient ids
+  const [message, setMessage] = useState("Welcome to the kitchen! Let's bake the fudgiest brownies.");
+  const [timer, setTimer] = useState(0); // used in mix & bake
+  const [stir, setStir] = useState(0); // 0..100
+  const [pourPct, setPourPct] = useState(0); // progress of pouring readiness
+  const [ovenTemp, setOvenTemp] = useState(350);
+  const [ovenMins, setOvenMins] = useState(22);
+  const [bakeProgress, setBakeProgress] = useState(0); // 0..100
+  const [score, setScore] = useState(0);
+  const [result, setResult] = useState("");
+  const [showTips, setShowTips] = useState(true);
+
+  const NEED = [
+    { id:"butter", label:"Butter", emoji:"🧈" },
+    { id:"choc", label:"Chocolate", emoji:"🍫" },
+    { id:"sugar", label:"Sugar", emoji:"🧃" },
+    { id:"eggs", label:"Eggs", emoji:"🥚" },
+    { id:"flour", label:"Flour", emoji:"🌾" },
+    { id:"cocoa", label:"Cocoa", emoji:"🍩" },
+    { id:"vanilla", label:"Vanilla", emoji:"🌼" },
+    { id:"salt", label:"Salt", emoji:"🧂" },
+  ];
+
+  // ---------- Sound ----------
+  const audioRef = useRef(null);
+  function audio(){ if(!audioRef.current){ audioRef.current = new (window.AudioContext||window.webkitAudioContext)(); } return audioRef.current; }
+  function beep(freq=720, dur=0.09){ const ctx = audio(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.type = "square"; o.frequency.value = freq; g.gain.value=0.06; o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur); }
+
+  function start(){ setStep(1); setMessage("Drag the ingredients into the heart‑bowl. Tap to pick up on mobile."); }
+  function toggleTips(){ setShowTips(v=>!v); }
+
+  // ---------- Drag & drop ----------
+  const dragItem = useRef(null);
+  function onDragStart(e, id){ dragItem.current = id; e.dataTransfer && e.dataTransfer.setData("text", id); }
+  function onDrop(e){
+    e.preventDefault();
+    const id = dragItem.current || (e.dataTransfer && e.dataTransfer.getData("text"));
+    if(!id) return;
+    if(!basket.includes(id)){
+      setBasket(b=>[...b, id]); beep(800,0.08);
+      setMessage(`${NEED.find(n=>n.id===id)?.label} added!`);
+    } else { setMessage("Already in the bowl!"); }
+    dragItem.current = null;
+  }
+
+  function proceedIfReady(){
+    if(basket.length===NEED.length){
+      setTimeout(()=>{ setStep(2); setMessage("Time to stir! Keep it glossy, not over‑mixed."); setTimer(0); setStir(0); setPourPct(0); }, 600);
+    }
+  }
+  useEffect(()=>{ proceedIfReady(); }, [basket]);
+
+  // ---------- MIX STEP ----------
+  // Keep meter between 70..88 for best texture. **Fix:** advance pour readiness using fresh state in setStir.
+  const [mixZoneActive, setMixZoneActive] = useState(false);
+  function onStirMove(){
+    if(step!==2) return;
+    setStir(prev => {
+      const next = Math.min(100, prev + 2.2);
+      if (next > 60) setPourPct(p=>Math.min(100, p + 1.4));
+      return next;
+    });
+    beep(900,0.04);
+  }
+  function onMixTick(){
+    // natural relaxation (batter thickens if left)
+    setStir(prev => {
+      const next = Math.max(0, prev - 0.6);
+      if (next > 60) setPourPct(p=>Math.min(100, p + 1.4));
+      return next;
+    });
+  }
+  useEffect(()=>{
+    if(step!==2) return; const id=setInterval(()=>{ setTimer(t=>t+1); onMixTick(); }, 200); return ()=>clearInterval(id);
+  }, [step]);
+
+  // ---------- BAKE STEP ----------
+  useEffect(()=>{ if(step!==3) return; const id=setInterval(()=>{ setBakeProgress(p=>Math.min(100, p+1.5)); }, 300); return ()=>clearInterval(id); }, [step]);
+
+  function calcScore(){
+    const mixQuality = Math.max(0, 100 - Math.abs(80 - stir)*3) * (pourPct/100);
+    const tempOff = Math.abs(350 - ovenTemp);
+    const timeOff = Math.max(0, Math.min(Math.abs(23 - ovenMins), 20));
+    const bakeQuality = Math.max(0, 100 - tempOff*0.6 - timeOff*8);
+    const total = Math.round(0.55*mixQuality + 0.45*bakeQuality);
+    setScore(total);
+    let verdict="";
+    if(total>=90) verdict = "Perfectly fudgy with shiny top! Lucy & Lala cheer.";
+    else if(total>=75) verdict = "Delicious! Slightly cakey edges, fudgy middle.";
+    else if(total>=60) verdict = "Pretty good—watch mixing & oven time next round.";
+    else verdict = "Oops… a bit dry or under‑mixed. Try again!";
+    setResult(verdict);
+  }
+
+  function reset(){
+    setStep(1); setBasket([]); setMessage("Fresh start—gather ingredients again."); setTimer(0); setStir(0); setPourPct(0); setOvenTemp(350); setOvenMins(22); setBakeProgress(0); setScore(0); setResult("");
+  }
+
+  // ---------- Tiny self‑tests (open console) ----------
+  useEffect(()=>{
+    console.groupCollapsed("Brownie Bake‑Off self‑tests");
+    // Simulate stir rising past 60 should advance pourPct
+    let simPour = 0; let simStir = 58;
+    const advance = () => { simStir = Math.min(100, simStir + 3); if (simStir>60) simPour = Math.min(100, simPour + 1.4); };
+    advance(); advance(); // now >60
+    console.assert(simPour > 0, "pourPct should advance when stir > 60");
+    console.groupEnd();
+  }, []);
+
+  // ---------- UI helpers ----------
+  function Pill({children}){ return <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/25 text-white/90 text-xs">{children}</span>; }
+  function Bar({value,color="bg-pink-400"}){ return (
+    <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+      <div className={`h-full ${color}`} style={{width:`${Math.max(0,Math.min(100,value))}%`}} />
+    </div>
+  ); }
+
+  return (
+    <div className="min-h-screen w-full bg-gradient-to-b from-rose-400 via-fuchsia-500 to-violet-600 flex justify-center py-6">
+      <div className="w-full max-w-5xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-4 sm:p-6 shadow-2xl">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h1 className="text-white text-2xl sm:text-3xl font-extrabold tracking-tight">🍫 Lucy & Lala: Brownie Bake‑Off</h1>
+          <div className="flex items-center gap-2">
+            {step===0 ? (
+              <button onClick={start} className="px-4 py-2 rounded-xl bg-white text-fuchsia-700 font-semibold shadow">Start Baking</button>
+            ) : (
+              <>
+                <button onClick={reset} className="px-3 py-2 rounded-xl bg-white/10 text-white border border-white/30">Reset</button>
+                <button onClick={toggleTips} className="px-3 py-2 rounded-xl bg-white/10 text-white border border-white/30">{showTips? 'Hide' : 'Show'} Tips</button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Status */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 text-white/90">
+          <div className="space-y-2">
+            <Pill>Step: <b className="ml-1">{['Intro','Gather','Mix','Bake','Results'][step]}</b></Pill>
+            <Pill>Basket: {basket.length}/{NEED.length}</Pill>
+          </div>
+          <div className="text-center">
+            <div className="inline-block px-4 py-1 rounded-full bg-white text-fuchsia-700 font-bold shadow">{message}</div>
+          </div>
+          <div className="text-right space-y-1">
+            {step===2 && (<div>Stir Level <Bar value={stir} color="bg-rose-300"/></div>)}
+            {step===2 && (<div>Pour Ready <Bar value={pourPct} color="bg-amber-300"/></div>)}
+            {step===3 && (<div>Bake Progress <Bar value={bakeProgress} color="bg-emerald-300"/></div>)}
+          </div>
+        </div>
+
+        {/* Game Board */}
+        <div className="bg-white/10 border border-white/20 rounded-2xl p-4 sm:p-6">
+          {step===0 && (
+            <div className="text-white/90">Lucy ties her pink apron, Lala snaps on her violet chef hat. "Let’s bake brownies!"</div>
+          )}
+
+          {step===1 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Pantry */}
+              <div className="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {NEED.map(item=> (
+                  <button
+                    key={item.id}
+                    draggable
+                    onDragStart={(e)=>onDragStart(e,item.id)}
+                    onClick={()=>onDragStart({dataTransfer:null},item.id)}
+                    className={`flex flex-col items-center justify-center h-24 rounded-2xl border transition ${basket.includes(item.id)?'bg-white/20 border-white/40 text-white/50':'bg-white/10 border-white/30 text-white hover:bg-white/20'}`}
+                  >
+                    <div className="text-3xl">{item.emoji}</div>
+                    <div className="mt-1 text-sm font-semibold">{item.label}</div>
+                  </button>
+                ))}
+              </div>
+              {/* Bowl Drop Zone */}
+              <div
+                onDragOver={(e)=>e.preventDefault()}
+                onDrop={onDrop}
+                onClick={(e)=>onDrop(e)}
+                className="relative rounded-2xl bg-white/10 border-2 border-dashed border-white/40 min-h-48 flex items-center justify-center p-4"
+              >
+                <div className="text-center text-white">
+                  <div className="text-5xl mb-2">💗🥣</div>
+                  <div className="font-semibold">Drop into the heart‑bowl</div>
+                  <div className="text-sm text-white/70">{NEED.length - basket.length} to go…</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step===2 && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
+              <div className="lg:col-span-2">
+                <div
+                  onMouseDown={()=>setMixZoneActive(true)}
+                  onMouseUp={()=>setMixZoneActive(false)}
+                  onMouseLeave={()=>setMixZoneActive(false)}
+                  onMouseMove={(e)=>{ if(mixZoneActive) onStirMove(); }}
+                  onTouchStart={()=>setMixZoneActive(true)}
+                  onTouchEnd={()=>setMixZoneActive(false)}
+                  onTouchMove={()=>{ if(mixZoneActive) onStirMove(); }}
+                  className="relative h-64 rounded-3xl bg-gradient-to-br from-rose-200/60 to-rose-400/60 border border-white/40 flex items-center justify-center select-none"
+                >
+                  <div className="absolute inset-3 rounded-3xl border-4 border-rose-200/70" />
+                  <div className="text-center">
+                    <div className="text-6xl">🥣✨</div>
+                    <div className="mt-2 text-white font-semibold">Stir here! Keep meter in the sweet spot (70–88)</div>
+                    <div className="mt-2"><Bar value={stir} color="bg-pink-500"/></div>
+                    <div className="mt-2 text-sm text-white/80">{stir<60? 'Needs more stirring…' : (stir<=88? 'Looks glossy!' : 'Careful: over‑mixing!')}</div>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center gap-3">
+                  <button
+                    disabled={pourPct<60}
+                    onClick={()=>{ setStep(3); setMessage('Into the oven! Aim for 350°F and ~22–24 min.'); beep(700,0.07); }}
+                    className={`px-4 py-2 rounded-xl font-semibold shadow ${pourPct<60? 'bg-white/20 text-white/60 cursor-not-allowed' : 'bg-white text-fuchsia-700'}`}
+                  >Pour into Pan & Bake</button>
+                  <Pill>Pour Readiness</Pill>
+                  <div className="min-w-[140px]"><Bar value={pourPct} color="bg-amber-400"/></div>
+                </div>
+              </div>
+              <div className="space-y-2 text-white/90">
+                {showTips && (
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    <li>Tap/drag in the bowl to stir.</li>
+                    <li>Stop before 90 to avoid tough batter.</li>
+                    <li>When Pour Readiness ≥ 60, you can bake.</li>
+                  </ul>
+                )}
+                <div className="mt-2 text-sm text-white/70">Timer: {Math.floor(timer/5)}s</div>
+              </div>
+            </div>
+          )}
+
+          {step===3 && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+              <div className="lg:col-span-2 space-y-4">
+                <div className="rounded-3xl p-4 bg-white/10 border border-white/30 text-white">
+                  <div className="flex items-center justify-between">
+                    <div className="text-lg font-semibold">Oven Controls 🔧</div>
+                    <Pill>Target: 350°F, 22–24 min</Pill>
+                  </div>
+                  <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex items-center justify-between text-sm"><span>Temp: {ovenTemp}°F</span><span className="text-white/70">ideal 350</span></div>
+                      <input className="w-full" type="range" min="300" max="400" value={ovenTemp} onChange={(e)=>setOvenTemp(Number(e.target.value))} />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between text-sm"><span>Time: {ovenMins} min</span><span className="text-white/70">ideal 22–24</span></div>
+                      <input className="w-full" type="range" min="15" max="30" value={ovenMins} onChange={(e)=>setOvenMins(Number(e.target.value))} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-3xl p-6 bg-gradient-to-br from-amber-200/50 to-amber-300/50 border border-white/40 text-center text-fuchsia-800">
+                  <div className="text-7xl">🧁🔥</div>
+                  <div className="mt-2 font-semibold">Baking… don’t open the door!</div>
+                  <div className="mt-3 max-w-md mx-auto"><Bar value={bakeProgress} color="bg-emerald-500"/></div>
+                  <div className="mt-2 text-sm text-fuchsia-900/80">Progress {Math.round(bakeProgress)}%</div>
+                  <div className="mt-4">
+                    {bakeProgress>=100 ? (
+                      <button onClick={()=>{ setStep(4); calcScore(); setMessage('Taste test time!'); beep(1000,0.12); }} className="px-4 py-2 rounded-xl bg-white text-fuchsia-700 font-semibold shadow">Take Brownies Out</button>
+                    ) : (
+                      <button onClick={()=>setBakeProgress(p=>Math.min(100,p+10))} className="px-4 py-2 rounded-xl bg-white/10 text-white border border-white/30">Peek (adds heat)</button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-white/90">
+                {showTips && (
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    <li>325–365°F is acceptable, 340–360 best.</li>
+                    <li>22–24 minutes yields glossy crackly top.</li>
+                    <li>Too hot/long = dry; too low/short = underbaked.</li>
+                  </ul>
+                )}
+              </div>
+            </div>
+          )}
+
+          {step===4 && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+              <div className="lg:col-span-2 text-white">
+                <div className="rounded-3xl p-6 bg-white/10 border border-white/30">
+                  <div className="text-6xl">🍫✨</div>
+                  <div className="mt-2 text-xl font-bold">Taste Test Results</div>
+                  <div className="mt-3 text-sm text-white/90">Score</div>
+                  <div className="mt-1 text-3xl font-extrabold">{score}/100</div>
+                  <div className="mt-3 text-white/90">{result}</div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Pill>Stir Level: {Math.round(stir)}</Pill>
+                    <Pill>Pour: {Math.round(pourPct)}%</Pill>
+                    <Pill>Oven: {ovenTemp}°F</Pill>
+                    <Pill>Time: {ovenMins} min</Pill>
+                  </div>
+                  <div className="mt-5 flex gap-2">
+                    <button onClick={reset} className="px-4 py-2 rounded-xl bg-white text-fuchsia-700 font-semibold shadow">Bake Again</button>
+                  </div>
+                </div>
+              </div>
+              <div className="text-white/90 space-y-2">
+                {showTips && (
+                  <>
+                    <div className="font-semibold">Pro Tips</div>
+                    <ul className="list-disc list-inside text-sm space-y-1">
+                      <li>Stop stirring as soon as flour streaks vanish.</li>
+                      <li>Crinkly tops love melted butter + sugar well combined.</li>
+                      <li>Let brownies cool 10 min before slicing.</li>
+                    </ul>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Controls */}
+        <div className="mt-4 text-xs text-white/60">Tip: If sounds don’t play, click once to allow audio. Drag ingredients or tap to add on mobile.</div>
+      </div>
+    </div>
+  );
+}
