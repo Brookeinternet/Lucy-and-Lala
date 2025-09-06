@@ -37,13 +37,6 @@
   </style>
 </head>
 <body class="antialiased text-gray-600">
-    <div class="min-h-screen flex flex-col items-center py-8 px-4">
-        <!-- Loading Overlay (visible by default) -->
-        <div id="loading-overlay" class="loading-overlay">
-            <div class="loading-spinner"></div>
-            <p class="text-xl text-pink-500 mt-4">Loading your happy place...</p>
-        </div>
-<body class="antialiased text-gray-600">
   <div class="min-h-screen flex flex-col items-center py-8 px-4">
     <header class="w-full container mx-auto text-center mb-12">
       <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
@@ -51,55 +44,6 @@
         <p class="text-xl md:text-2xl text-pink-800 font-semibold">Get ready for new stories from Lucy and Lala! 💖</p>
       </div>
     </header>
- <!-- Combined Auth and Pro Subscriber Section -->
-        <div class="container mx-auto flex flex-col md:flex-row items-start gap-8">
-            <section id="auth-section" class="w-full md:w-1/2">
-                <div id="auth-container" class="auth-form-container hidden">
-                    <div id="auth-status" class="p-4 hidden">
-                        <p class="font-semibold text-lg" id="auth-message"></p>
-                        <p class="text-sm" id="user-id"></p>
-                        <div class="flex justify-center items-center gap-4 mt-4">
-                            <a href="user-profile-page.html" class="btn-primary py-2 px-4">My Profile 🧑‍💻</a>
-                            <button id="sign-out-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors">Sign Out</button>
-                        </div>
-                    </div>
-
-                    <div id="auth-form-container-inner" class="">
-                        <form id="login-form" class="space-y-4">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Login to Your Account</h3>
-                            <input type="email" id="login-email" placeholder="Email" required class="block">
-                            <input type="password" id="login-password" placeholder="Password" required class="block">
-                            <button type="submit" class="btn-auth-primary w-full">Login</button>
-                            <p class="text-sm">
-                                Don't have an account? <a href="#" id="show-signup" class="text-indigo-600 hover:underline">Sign Up</a>
-                            </p>
-                            <p class="text-sm">
-                                <a href="#" id="show-forgot-password" class="text-indigo-600 hover:underline">Forgot Password?</a>
-                            </p>
-                        </form>
-
-                        <form id="signup-form" class="space-y-4 hidden">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Create New Account</h3>
-                            <input type="email" id="signup-email" placeholder="Email" required class="block">
-                            <input type="password" id="signup-password" placeholder="Password" required class="block">
-                            <button type="submit" class="btn-auth-primary w-full">Sign Up</button>
-                            <p class="text-sm">
-                                Already have an account? <a href="#" id="show-login" class="text-indigo-600 hover:underline">Login</a>
-                            </p>
-                        </form>
-
-                        <form id="forgot-password-form" class="space-y-4 hidden">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Reset Password</h3>
-                            <input type="email" id="reset-email" placeholder="Enter your email" required class="block">
-                            <button type="submit" class="btn-auth-primary w-full">Send Reset Email</button>
-                            <p class="text-sm">
-                                <a href="#" id="back-to-login" class="text-indigo-600 hover:underline">Back to Login</a>
-                            </p>
-                        </form>
-                        <p id="auth-error-message" class="text-red-600 text-sm mt-2"></p>
-                    </div>
-                </div>
-            </section>
 
     <!-- Future Fun -->
     <section class="w-full container mx-auto articles-list-callout">
@@ -162,7 +106,7 @@
     <section class="w-full container mx-auto holiday-callout">
       <h2 class="text-4xl font-extrabold mb-2 drop-shadow-sm">🎁 Holiday Magic Collection</h2>
       <p class="holiday-sub">$12.99/mo plan required.</p>
-      <a href="https://buy.stripe.com/aFa00lfBKdokcsN7t0abK03" target="_blank" class="cta-btn">Unlock Holiday Magic, only $2 for Pro member add-on</a>
+      <a href="https://buy.stripe.com/aFa00lfBKdokcsN7t0abK03" target="_blank" class="cta-btn">Unlock Holiday Magic</a>
       <div id="holiday-addon" class="hidden">
         <p class="holiday-sub mt-4">Already a Pro? Add Holiday Plan for just $2 more!</p>
         <a href="https://buy.stripe.com/aFa28t0GQdok64p6oWabK04" target="_blank" class="cta-btn">Add Holiday Add-on $2</a>
@@ -234,11 +178,6 @@
 
     <!-- Recipes -->
     <section class="w-full container mx-auto mt-10">
-   
-      <div id="holiday-addon" class="hidden">
-        <p class="holiday-sub mt-4">Already a Pro? Add Food and Recipes Plan for just $2 more!</p>
-        <a href="https://buy.stripe.com/dRm14pfBKdokboJcNkabK05" target="_blank" class="cta-btn">Add Holiday Add-on $2</a>
-      </div>
       <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">🍓 Recipes & Food</h2>
       <ul class="articles-list">
         <li><div class="article-card"><img src="https://placehold.co/350x220/fcd34d/1f2937?text=Peaches+in+Park" class="article-thumbnail"><span>🍑 Peaches in Park</span><span class="release-date">October 14</span></div></li>
@@ -249,279 +188,91 @@
     <!-- Books -->
     <section class="w-full container mx-auto mt-10">
       <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">📖 Lucy & Lala Books</h2>
-    
-        <div id="holiday-addon" class="hidden">
-        <p class="holiday-sub mt-4">Already a Pro? Add  Lucy and Lala Books Plan for just $2 more!</p>
-        <a href=" https://buy.stripe.com/cNi6oJ2OY840eAVbJgabK06" target="_blank" class="cta-btn">Add  Books With Lucy and Lala Add-on $2</a>
-         <ul class="articles-list">
+      <ul class="articles-list">
         <li><div class="article-card"><img src="https://placehold.co/350x220/93c5fd/1f2937?text=Beyonce" class="article-thumbnail"><span>🌟 Beyonce - Little People, Big Dreams Review</span><span class="release-date">October 21</span></div></li>
         <li><div class="article-card"><img src="https://placehold.co/350x220/f9a8d4/1f2937?text=Dolly+Parton" class="article-thumbnail"><span>🎤 Dolly Parton - Little People, Big Dreams Review</span><span class="release-date">October 21</span></div></li>
       </ul>
     </section>
   </div>
-<section class="w-full container mx-auto mt-10">
-      <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">Lucy & Lala Extras</h2>
 
-  <a href="brownie.html">
-    <button>Lucy and Lala Bronwie Game</button> 
-    
-    
-</a>
    <!-- About Section -->
     <section class="w-full container mx-auto mt-12 bg-white shadow-md rounded-3xl p-8">
       <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">👧 About Lucy & Lala</h2>
-      <p class="text-lg text-gray-700 leading-relaxed">Lucy and Lala are two twins who explore the world with giggles, creativity, and kindness. Whether they’re at the arcade, baking treats, or going on magical holiday adventures, they always remind us that childhood is full of greatness.
- <div class="article-card bg-yellow-400 text-white"> <a href="lucy.html">Visit Lucy article</a>
-        <img src="https://i.imgur.com/AGFLoQt.jpeg" alt="About Lucy" 
+      <p class="text-lg text-gray-700 leading-relaxed">Lucy and Lala are two best friends who explore the world with giggles, creativity, and kindness. Whether they’re at the arcade, baking treats, or going on magical holiday adventures, they always remind us that childhood is full of
+ <div class="article-card bg-yellow-400 text-white">
+        <img src="https://placehold.co/350x220/ffb6c1/ffffff?text=Lucy" alt="About Lucy" class="article-thumbnail">
             🌈 About Lucy
           </div>
         </li>
         <li>
           <div class="article-card bg-yellow-400 text-white">
-             <div class="article-card bg-yellow-400 text-white"> <a href="lala.html">Visit Lala article </a>
-            <img src="https://i.imgur.com/2hF6eFD.jpeg" alt=" About Lala" 
+             <div class="article-card bg-yellow-400 text-white">
+            <img src="https://i.imgur.com/2hF6eFD.jpeg" alt=" About Lala" class="/article-thumbnail">
             About Lala
           </div>
         </li>
  </ul>
+<!-- Auth Forms Section -->
+    <section class="w-full container mx-auto flex flex-col md:flex-row justify-center gap-8">
+      <!-- Sign Up -->
+      <div class="form-container md:w-1/2" id="signup-section">
+        <h2>Sign Up</h2>
+        <form id="signup-form">
+          <input type="email" id="signup-email" placeholder="Email" required autocomplete="email">
+          <input type="password" id="signup-password" placeholder="Password" required autocomplete="new-password">
+          <button type="submit">Create Account</button>
+          <span class="toggle-link" onclick="toggleForms('login')">Already have an account? Log in</span>
+        </form>
+      </div>
+
+      <!-- Log In -->
+      <div class="form-container md:w-1/2 hidden" id="login-section">
+        <h2>Log In</h2>
+        <form id="login-form">
+          <input type="email" id="login-email" placeholder="Email" required autocomplete="email">
+          <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+          <button type="submit">Log In</button>
+          <span class="toggle-link" onclick="toggleForms('signup')">Don't have an account? Sign up</span>
+        </form>
+      </div>
+    </section>
+
+   
+  </div>
 
   <script>
-    // Example logic: only show the $2 add-on (Holiday, Food and Recipes,Books) if user is Pro
+    function toggleForms(show) {
+      document.getElementById('signup-section').classList.add('hidden');
+      document.getElementById('login-section').classList.add('hidden');
+      if (show === 'signup') {
+        document.getElementById('signup-section').classList.remove('hidden');
+      } else {
+        document.getElementById('login-section').classList.remove('hidden');
+      }
+    }
+
+    document.getElementById('signup-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      alert('Sign Up form submitted for ' + document.getElementById('signup-email').value);
+    });
+
+    document.getElementById('login-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      alert('Login form submitted for ' + document.getElementById('login-email').value);
+    });
+
+    // Example logic: only show the $2 add-on if user is Pro
+    const isProUser = false; // Replace with real check from your auth system
+    if(isProUser){
+      const addon = document.getElementById('holiday-addon');
+      if(addon) addon.classList.remove('hidden');
+    }
+ 
+    // Example logic: only show the $2 add-on if user is Pro
     const isProUser = false; // Replace with real check from your auth system
     if(isProUser){
       document.getElementById('holiday-addon').classList.remove('hidden');
     }
-     <script src="https://js.stripe.com/v3/"></script>
-    <script type="module">
-        // Firebase imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Initialize Stripe.js with your publishable key
-        const stripe = Stripe('pk_live_51Ro7nNReyOAsAwqJH3XMcYCu0yYudEZ4sDCQfUfYLe7ECg4jRslHvnMX5WOIx7c7wfSxkSNwJrBeKnF9KnDyAoXR00eyCtYQGI');
-
-
-        // Global variables for Firebase config and app ID
-       const firebaseConfig = {
-    apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
-    authDomain: "lucyandlala.firebaseapp.com",
-    projectId: "lucyandlala",
-    storageBucket: "lucyandlala.firebasestorage.app",
-    messagingSenderId: "422161772278",
-    appId: "1:422161772278:web:a39c41f9ad967d379886d7",
-    measurementId: "G-JZJK3JWCKH"
-};
-
-        // Initialize Firebase
-        let app = null;
-        let auth = null;
-        let db = null;
-        let authInitialized = false;
-
-        if (firebaseConfig && firebaseConfig.apiKey) {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            authInitialized = true;
-        } else {
-            console.warn("Firebase config not found or invalid. Authentication features will not be available.");
-            // Hide auth UI if Firebase is not configured
-            document.getElementById('auth-container').classList.add('hidden');
-        }
-
-        let currentUserId = null;
-
-        // Auth UI Elements
-        const authContainer = document.getElementById('auth-container');
-        const authStatusDiv = document.getElementById('auth-status');
-        const authFormContainer = document.getElementById('auth-form-container');
-        const authMessage = document.getElementById('auth-message');
-        const userIdDisplay = document.getElementById('user-id');
-        const signOutButton = document.getElementById('sign-out-button');
-        const authErrorMessage = document.getElementById('auth-error-message');
-
-        // Forms and their toggles
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        const forgotPasswordForm = document.getElementById('forgot-password-form');
-        const showSignupLink = document.getElementById('show-signup');
-        const showLoginLink = document.getElementById('show-login');
-        const showForgotPasswordLink = document.getElementById('show-forgot-password');
-        const backToLoginLink = document.getElementById('back-to-login');
-
-        // Input fields
-        const loginEmailInput = document.getElementById('login-email');
-        const loginPasswordInput = document.getElementById('login-password');
-        const signupEmailInput = document.getElementById('signup-email');
-        const signupPasswordInput = document.getElementById('signup-password');
-        const resetEmailInput = document.getElementById('reset-email');
-
-        // --- Helper Functions for UI Toggling ---
-        function showForm(formToShow) {
-            if (loginForm) loginForm.classList.add('hidden');
-            if (signupForm) signupForm.classList.add('hidden');
-            if (forgotPasswordForm) forgotPasswordForm.classList.add('hidden');
-            if (authErrorMessage) authErrorMessage.textContent = '';
-            if (formToShow) formToShow.classList.remove('hidden');
-        }
-
-        // --- Firebase Auth Functions ---
-
-        /**
-         * Fetches a user's subscriber status from Firestore.
-         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
-         */
-        async function getProSubscriberStatus() {
-            if (!authInitialized || !db || !currentUserId) return false;
-            try {
-                const userDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/profile`, 'subscription');
-                const docSnap = await getDoc(userDocRef);
-                return docSnap.exists() && docSnap.data().isProSubscriber === true;
-            } catch (error) {
-                console.error("Error fetching subscriber status:", error);
-                return false;
-            }
-        }
-
-        // Function to update UI based on auth state
-        async function updateAuthUI(user) {
-            if (user) {
-                if (authContainer) authContainer.classList.add('hidden'); // Hide the entire auth container when signed in
-            } else {
-                if (authContainer) authContainer.classList.remove('hidden'); // Show the container when signed out
-            }
-            if (authStatusDiv) authStatusDiv.classList.toggle('hidden', !user); // Show status div if user exists
-            if (authFormContainer) authFormContainer.classList.toggle('hidden', !!user); // Show form container if user does NOT exist
-
-            if (user) {
-                if (authMessage) authMessage.textContent = 'You are signed in!';
-                if (userIdDisplay) userIdDisplay.textContent = `User ID: ${user.uid}`;
-                await updateProStatusUI();
-            } else {
-                if (authMessage) authMessage.textContent = ''; // Clear previous messages
-                if (userIdDisplay) userIdDisplay.textContent = '';
-                showForm(loginForm); // Show login form by default
-            }
-            // Once auth state is determined, hide the loading overlay
-            const loadingOverlay = document.getElementById('loading-overlay');
-            if (loadingOverlay) loadingOverlay.classList.add('hidden');
-        }
-
-        // Function to update Pro Status UI (reads from Firestore)
-        async function updateProStatusUI() {
-            const isProSubscriber = await getProSubscriberStatus();
-            const articleLinks = document.querySelectorAll('.articles-list a');
-            articleLinks.forEach(link => {
-                let proBadge = link.querySelector('.pro-badge');
-                if (link.dataset.pro === 'true') {
-                    if (!proBadge) {
-                        const span = document.createElement('span');
-                        span.className = 'pro-badge';
-                        span.textContent = 'PRO';
-                        link.querySelector('span:not(.release-date)').appendChild(span);
-                    }
-                } else {
-                    if (proBadge) {
-                        proBadge.remove();
-                    }
-                }
-            });
-        }
-
-        // --- Event Listeners for Forms ---
-        if (authInitialized) {
-            if (showSignupLink) showSignupLink.addEventListener('click', (e) => { e.preventDefault(); showForm(signupForm); });
-            if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
-            if (showForgotPasswordLink) showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotPasswordForm); });
-            if (backToLoginLink) backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
-
-            if (loginForm) loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = loginEmailInput.value;
-                const password = loginPasswordInput.value;
-                if (authErrorMessage) authErrorMessage.textContent = '';
-                try {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    alert('Successfully logged in!');
-                } catch (error) {
-                    console.error("Login error:", error);
-                    if (authErrorMessage) authErrorMessage.textContent = error.message;
-                }
-            });
-
-            if (signupForm) signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = signupEmailInput.value;
-                const password = signupPasswordInput.value;
-                if (authErrorMessage) authErrorMessage.textContent = '';
-                try {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    alert('Account created successfully! You are now logged in.');
-                } catch (error) {
-                    console.error("Sign up error:", error);
-                    if (authErrorMessage) authErrorMessage.textContent = error.message;
-                }
-            });
-
-            if (forgotPasswordForm) forgotPasswordForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = resetEmailInput.value;
-                if (authErrorMessage) authErrorMessage.textContent = '';
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    alert('Password reset email sent! Check your inbox.');
-                    showForm(loginForm);
-                } catch (error) {
-                    console.error("Password reset error:", error);
-                    if (authErrorMessage) authErrorMessage.textContent = error.message;
-                }
-            });
-
-            if (signOutButton) signOutButton.addEventListener('click', async () => {
-                try {
-                    await signOut(auth);
-                    alert('You have been signed out.');
-                } catch (error) {
-                    console.error("Error signing out:", error);
-                    alert('Error signing out. Please try again.');
-                }
-            });
-
-            document.querySelectorAll('.articles-list a').forEach(link => {
-                link.addEventListener('click', async function(event) {
-                    const isProArticle = this.dataset.pro === 'true';
-                    const isUserPro = await getProSubscriberStatus();
-                    if (isProArticle && !isUserPro) {
-                        event.preventDefault();
-                        alert('This content is for Pro Subscribers only! Please subscribe to unlock.');
-                        window.open('https://buy.stripe.com/eVq00ldtC8408cxfZwabK00', '_blank');
-                    }
-                });
-            });
-        }
-        
-        // Initial Auth State Check
-        if (authInitialized) {
-            onAuthStateChanged(auth, (user) => {
-                currentUserId = user ? user.uid : null;
-                updateAuthUI(user);
-            });
-        } else {
-            // Hide the loading overlay and show a message if auth is not initialized
-            document.getElementById('loading-overlay').classList.add('hidden');
-            const authSection = document.getElementById('auth-section');
-            if (authSection) {
-                 authSection.innerHTML = `
-                    <div class="auth-form-container">
-                        <p class="text-red-600 font-bold">Authentication is unavailable.</p>
-                        <p class="text-sm">Please try again later or contact support.</p>
-                    </div>
-                `;
-                 authSection.classList.remove('hidden');
-            }
-        }
-    </script>
-  
+  </script>
 </body>
 </html>
