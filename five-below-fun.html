@@ -281,6 +281,149 @@
     <footer class="text-center p-6 mt-10 bg-gray-200 text-gray-600">
         <p>Happy Shopping from Lucy & Lala!</p>
     </footer>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // --- Config & Globals ---
+    const appId = (typeof window !== 'undefined' && typeof window.__app_id !== 'undefined') ? window.__app_id : 'default-app-id';
+    const initialAuthToken = (typeof window !== 'undefined' && typeof window.__initial_auth_token !== 'undefined') ? window.__initial_auth_token : null;
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+      authDomain: "lucyandlala.firebaseapp.com",
+      projectId: "lucyandlala",
+      storageBucket: "lucyandlala.firebasestorage.app",
+      messagingSenderId: "422161772278",
+      appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+      measurementId: "G-JZJK3JWCKH"
+    };
+
+    let app = null, auth = null, db = null, currentUserId = null;
+
+    if (firebaseConfig && firebaseConfig.apiKey) {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      console.log("Firebase services initialized.")
+    } else {
+      console.warn("Firebase config not found. Auth/Pro status disabled.");
+    }
+
+    // --- Helpers ---
+    function isAdminRestrictedError(err){
+      return !!(err && (err.code === 'auth/admin-restricted-operation' || /admin-restricted/i.test(err.message||'')));
+    }
+
+    async function safeClientSignIn(auth, token){
+      if (!auth) return null;
+      // If already signed in, no-op
+      if (auth.currentUser) return auth.currentUser;
+
+      // Prefer custom token only if provided; fallback to anonymous on any failure
+      if (token && typeof token === 'string' && token.trim().length){
+        try {
+          const cred = await signInWithCustomToken(auth, token);
+          return cred.user;
+        } catch (e) {
+          console.warn('Custom-token sign-in failed; falling back to anonymous:', e?.code || e);
+          // Fall through to anonymous for admin-restricted and any other errors
+        }
+      }
+
+      try {
+        const cred = await signInAnonymously(auth);
+        return cred.user;
+      } catch (e) {
+        console.warn('Anonymous sign-in failed (is it enabled in Firebase console?):', e?.code || e);
+        return null; // Continue unauthenticated; Firestore read may be denied and we will treat as non-Pro
+      }
+    }
+
+    async function getAuthenticatedUserId(){
+      if (!auth) return null;
+      return new Promise(resolve => {
+        const unsub = onAuthStateChanged(auth, (user)=>{ unsub(); resolve(user ? user.uid : null); });
+      });
+    }
+
+    async function getProSubscriberStatus(){
+      if (!db) return false;
+      const userId = await getAuthenticatedUserId();
+      if (!userId) return false;
+      try {
+        const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+        const docSnap = await getDoc(userDocRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          return data.isProSubscriber === true;
+        }
+        return false;
+      } catch (e) {
+        // Permission-denied or other Firestore errors => treat as not Pro instead of crashing
+        console.warn('Firestore read error (treating as non-Pro):', e?.code || e);
+        return false;
+      }
+    }
+
+    const releaseDate = new Date('2025-10-15T00:00:00');
+    const currentDate = new Date();
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Sign-in safely (no admin-only client calls). Falls back to anonymous, then no-auth.
+      await safeClientSignIn(auth, initialAuthToken);
+
+      if (currentDate < releaseDate) {
+        // Date-locked overlay
+        document.body.insertAdjacentHTML('beforeend', `
+          <div class="locked-overlay" data-testid="locked-overlay">
+            <h3>🔒 Coming Soon!</h3>
+            <img src= https://i.imgur.com/xgPNFzm.jpeg width="700" height="700" class="mb-12 bg-white p-8 rounded-xl shadow-md text-center">
+            <p>This exclusive snack time adventure will be released on  October 15th, 2025!</p>
+            <p>Check back soon to see Lucy and Lala's shopping spree!</p>
+            <a href="index.html" class="mt-4">Back to All Adventures! 🎀</a>
+          </div>`);
+        document.body.style.overflow = 'hidden';
+      } else {
+        const isProSubscriber = await getProSubscriberStatus();
+        if (!isProSubscriber) {
+          const mainContent = document.querySelector('main');
+          if (mainContent) {
+            mainContent.insertAdjacentHTML('afterbegin', `
+              <div class="pro-content-overlay" data-testid="pro-overlay">
+                <h3>🔒 Pro Content Only!</h3>
+                <p>This exclusive snack time adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+              </div>`);
+            const article = mainContent.querySelector('article');
+            if (article) { article.style.filter = 'blur(5px)'; article.style.pointerEvents = 'none'; }
+          }
+        }
+      }
+
+      // --- Test Suite (do not modify existing tests; add more below) ---
+      (function runTests(){
+        const results = [];
+        const t = (name, pass) => { results.push({ test: name, pass: !!pass }); console.assert(pass, name); };
+        try {
+          // Existing tests
+          t('initialAuthToken variable is defined', typeof initialAuthToken !== 'undefined');
+          t('appId variable is defined', typeof appId !== 'undefined');
+          t('releaseDate is a Date', releaseDate instanceof Date);
+          if (currentDate < releaseDate) {
+            t('Locked overlay injected before release date', !!document.querySelector('[data-testid="locked-overlay"]'));
+          } else {
+            t('Either article or pro overlay present after release', !!document.querySelector('article') || !!document.querySelector('[data-testid="pro-overlay"]'));
+          }
+
+          // Additional tests (new)
+          t('isAdminRestrictedError identifies admin-restricted error', isAdminRestrictedError({ code: 'auth/admin-restricted-operation', message: 'admin restricted' }));
+          t('isAdminRestrictedError returns false for null', !isAdminRestrictedError(null));
+          t('safeClientSignIn function exists', typeof safeClientSignIn === 'function');
+        } catch (e) {
+          console.error('Test suite error:', e);
+        } finally {
+          console.table(results);
 </body>
 </html>
