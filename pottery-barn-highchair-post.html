@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pink Play Highchair & Growing Up - Lucy and Lala's Adventures</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (like heart) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff0f5; /* Blush pink for an even cutesier feel */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 3rem; /* Space for footer */
+        }
+        .container {
+            max-width: 900px; /* Max width for content */
+            width: 100%;
+        }
+        .blog-section {
+            background-color: #ffffff; /* White background for sections */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); /* Softer, more diffused shadow */
+            border: 4px solid #fecdd3; /* Rose pink, slightly thicker border */
+            border-radius: 2rem; /* More rounded corners */
+            overflow: hidden; /* Ensures rounded corners apply to children */
+            margin-bottom: 2.5rem; /* Space between sections */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
+        }
+        .blog-section:hover {
+            transform: translateY(-8px); /* More pronounced lift on hover */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+        }
+        .btn-primary {
+            background-color: #ff85a2; /* Brighter, more vibrant pink */
+            color: #ffffff;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            border: 2px solid #ffffff; /* White border for a cute outline */
+        }
+        .btn-primary:hover {
+            background-color: #ff6b8f; /* Darker pink on hover */
+            transform: translateY(-3px) scale(1.05); /* More pronounced lift and slight scale */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+        }
+        .header-bg {
+            background-image: linear-gradient(to right, #fbcfe8, #fbc0f8); /* Softer, more magical gradient */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* Subtle text shadow for header */
+        }
+        h1 {
+            font-weight: 900; /* Even bolder font for the main title */
+        }
+        h2, h3 {
+            font-weight: 800; /* Bolder font for post titles */
+        }
+        .text-cutesy-pink {
+            color: #ff85a2; /* Custom cutesy pink color */
+        }
+        .like-button {
+            cursor: pointer;
+            font-size: 2.5rem; /* Larger heart icon */
+            color: #ccc; /* Default grey */
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .like-button.liked {
+            color: #ff6b8f; /* Pink when liked */
+            transform: scale(1.1);
+        }
+        .like-button:active {
+            transform: scale(0.9); /* Squish effect on click */
+        }
+        .image-container, .video-container {
+            position: relative;
+            padding-bottom: 75%; /* 4:3 Aspect Ratio (adjust as needed) */
+            height: 0;
+            overflow: hidden;
+            border-bottom: 4px solid #fecdd3; /* Border between media and text */
+        }
+        .image-container img, .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures media covers the area */
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+      
+
+        // Global variables for Firebase config and app ID
+       const firebaseConfig = {
+    apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+    authDomain: "lucyandlala.firebaseapp.com",
+    projectId: "lucyandlala",
+    storageBucket: "lucyandlala.firebasestorage.app",
+    messagingSenderId: "422161772278",
+    appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+    measurementId: "G-JZJK3JWCKH"
+
+        let auth = null;
+        let db = null;
+        let currentUserId = null;
+
+        // Initialize Firebase services only if config is available
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase services initialized.");
+        } else {
+            console.warn("Firebase config not found. Authentication and Pro status will not be available.");
+        }
+        
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            if (!auth) return null;
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            if (!db) return false;
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
+        const releaseDate = new Date('2025-09-20T00:00:00'); // Set release date to September 20th, 2025
+        const currentDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Ensure Firebase Auth is ready before checking status
+            if (auth) {
+                 await new Promise(resolve => {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            currentUserId = user.uid;
+                        } else {
+                             // If no user is signed in, attempt anonymous or custom token sign-in
+                            if (initialAuthToken) {
+                                signInWithCustomToken(auth, initialAuthToken)
+                                    .then((userCredential) => {
+                                        console.log("Signed in with custom token:", userCredential.user.uid);
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error signing in with custom token:", error);
+                                        signInAnonymously(auth)
+                                            .then(() => console.log("Signed in anonymously (fallback)."))
+                                            .catch(e => console.error("Error signing in anonymously:", e));
+                                    });
+                            } else {
+                                signInAnonymously(auth)
+                                    .then(() => console.log("Signed in anonymously."))
+                                    .catch(e => console.error("Error signing in anonymously:", e));
+                            }
+                        }
+                        resolve();
+                    });
+                });
+            }
+
+
+            if (currentDate < releaseDate) {
+                // Article is date-locked for everyone
+                document.body.innerHTML = `
+                    <div class="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This delightful adventure will be released on September 20th, 2025!</p>
+                        <p>Check back soon to see Lucy and Lala's favorite highchair!</p>
+                        <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                            Back to All Adventures! 🎀
+                        </a>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            } else {
+                // Article is released, now check Pro status
+                const isProSubscriber = await getProSubscriberStatus();
+                if (!isProSubscriber) {
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                        mainContent.innerHTML = `
+                            <div class="pro-content-overlay">
+                                <h3>🔒 Pro Content Only!</h3>
+                                <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                                <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                            </div>
+                            ${mainContent.innerHTML}
+                        `;
+                        // Optionally blur or reduce opacity of content behind overlay
+                        const contentToBlur = mainContent.querySelector('article');
+                        if (contentToBlur) {
+                            contentToBlur.style.filter = 'blur(5px)';
+                            contentToBlur.style.pointerEvents = 'none';
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
+                    🎀 Our Favorite Pink Play Highchair! 💖
+                </h1>
+                <p class="text-xl md:text-2xl text-pink-800 font-semibold">
+                    A cherished toy from Pottery Barn & years of fun! ✨
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Blog Post Content -->
+        <main class="w-full container mx-auto">
+            <!-- Section 1: The Highchair Introduction -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/gkjXvtB.jpeg" alt="Pink kiddie play highchair">
+                </div>
+                <div class="p-8 text-center">
+                    <h2 class="text-4xl font-extrabold text-cutesy-pink mb-4">Meet Our Beloved Play Highchair! 🍼🧸</h2>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        Every child has that one special toy, and for Lucy and Lala, it's their adorable **pink kiddie play highchair from <a href="https://www.potterybarnkids.com/shop/play-kitchens-dollhouses/play-furniture/" target="_blank" class="text-pink-600 font-bold hover:underline">Pottery Barn Kids</a>**! This charming piece of play furniture has been a staple in their imaginative play for years, witnessing countless pretend meals, tea parties, and baby doll feedings. It's not just a toy; it's a centerpiece for their nurturing play, encouraging empathy and creativity every single day.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 2: When They First Got It (Younger) -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/NRFo5K5.jpeg" alt="Younger Lucy and Lala with the play highchair">
+                </div>
+                <div class="p-8 text-center">
+                    <h3 class="text-4xl font-extrabold text-cutesy-pink mb-4">Tiny Hands, Brand New Toy! 👶💖</h3>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        Oh, how time flies! This precious photo takes us back to when Lucy and Lala first got their Pottery Barn highchair. Look at their tiny selves, barely able to reach the tray, but already filled with so much excitement and curiosity! They instantly fell in love with its sweet pink hue and sturdy design, perfectly sized for their favorite baby dolls and stuffed animals. It quickly became a beloved addition to their playroom, sparking endless hours of nurturing play even at such a young age.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 3: Playtime Moments -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/VAgU7II.jpeg" alt="Lucy and Lala playing with the highchair">
+                </div>
+                <div class="p-8 text-center">
+                    <h3 class="text-4xl font-extrabold text-cutesy-pink mb-4">Imagination in Full Bloom! 🌸✨</h3>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        This highchair has seen it all – from elaborate doll tea parties to quiet moments of feeding their "babies." It's amazing to witness their imaginations in full bloom as they role-play, mimicking the care and love they receive. The highchair provides the perfect prop for developing their social skills and understanding of routines. It's a testament to good quality play furniture that can truly grow with a child's evolving play patterns.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 4: Lucy and Lala Today with the Highchair -->
+            <section class="blog-section">
+                <div class="image-container">
+                    <img src="https://i.imgur.com/R9lkTwB.jpeg" alt="Lucy and Lala today with the play highchair">
+                </div>
+                <div class="p-8 text-center">
+                    <h3 class="text-4xl font-extrabold text-cutesy-pink mb-4">Still a Favorite, Years Later! 🥰👧👧</h3>
+                    <p class="text-gray-700 leading-relaxed mb-6 text-lg">
+                        And here are Lucy and Lala today, still cherishing their pink play highchair! It's incredible how a well-made toy can stand the test of time and remain a central part of their play. Even as they grow, their nurturing instincts and imaginative scenarios continue to thrive around this beloved piece. It's a joy to see them continue to create beautiful memories with it, proving that some toys truly become part of the family. This highchair is definitely a testament to the lasting quality and charm of <a href="https://www.potterybarnkids.com/shop/play-kitchens-dollhouses/play-furniture/" target="_blank" class="text-pink-600 font-bold hover:underline">Pottery Barn Kids' play furniture</a>.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Single Like Button and Back to All Adventures Button -->
+            <div class="flex flex-col items-center space-y-6 mt-12">
+                <p class="text-xl font-semibold text-gray-700">Did you enjoy this sweet look back at their play?</p>
+                <div class="flex items-center space-x-6">
+                    <i class="fas fa-heart like-button" onclick="toggleLike(this)"></i>
+                    <button class="btn-primary py-4 px-8 rounded-full inline-block font-bold text-lg shadow-lg hover:shadow-xl">
+                        Like This Post! ❤️
+                    </button>
+                </div>
+            </div>
+            </article>
+
+            <a href="toddler-blog" class="btn-primary py-5 px-10 rounded-full inline-block font-extrabold text-xl shadow-lg hover:shadow-xl mt-6">
+                Back to All Adventures! 🎀
+            </a>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="w-full container mx-auto text-center mt-12 py-8 border-t-4 border-pink-300 rounded-t-3xl bg-white shadow-inner">
+            <p class="text-gray-600 text-lg font-bold">
+                &copy; 2025 Lucy and Lala's Adventures. All rights reserved. Made with extra love and sprinkles! ❤️✨
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Function to toggle the 'liked' state of the heart button
+        function toggleLike(element) {
+            element.classList.toggle('liked');
+            // You could add more logic here, like sending data to a server
+            // or incrementing a like count displayed next to the heart.
+        }
+    </script>
+</body>
+</html>
+
