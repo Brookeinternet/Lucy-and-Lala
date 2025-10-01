@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Critter Kitchen Chaos: Lucy & Lala’s Calico Family Fun</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Soft Pastels (Greens, Creams, Blues, Pinks) -->
+    <!-- Application Structure Plan: A single-page, vertical scroll application with thematic sections (Hero, Introduction, Set-Up, Play Highlights, Why They Love, Memory Moments, Footer). This structure creates a narrative flow, allowing users to explore details about the imaginative play, the characters involved, and the girls' interactions. Interactive elements enhance engagement by revealing details or highlighting key moments. Images are integrated to enhance visual storytelling. -->
+    <!-- Visualization & Content Choices: Report Info: Main Title -> Goal: Inform/Engage -> Viz: Styled HTML Text -> Interaction: Static -> Justification: Clear and inviting. | Report Info: Today's Set-Up -> Goal: Inform/Organize -> Viz: Clickable Cards -> Interaction: JS toggle visibility -> Justification: Allows progressive disclosure of details about the play setup and outfits. | Report Info: Play Highlights/Quotes -> Goal: Engage -> Viz: Highlighted Text with hover for speaker -> Interaction: Hover to reveal speaker -> Justification: Adds personality and makes quotes stand out. | Report Info: Why They Love/Memory Moments -> Goal: Inform/Inform -> Viz: Styled lists/cards -> Interaction: Static/Hover -> Justification: Presents information clearly and highlights fun facts. | Report Info: New Images -> Goal: Illustrate/Engage -> Viz: Images -> Interaction: Static display -> Justification: Provides visual context to the play highlights and memory moments. | Report Info: Detailed Kitchen Set/French Bulldog Family -> Goal: Inform -> Viz: Updated list items within expandable cards -> Interaction: Click to expand -> Justification: Provides specific product details within the relevant interactive section. CONFIRMING NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .card-expandable .content {
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.5s ease-out;
+            overflow: hidden;
+        }
+        .card-expandable.active .content {
+            max-height: 300px; /* Adjusted max-height to accommodate more content */
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.5s ease-in;
+        }
+        .card-expandable.active {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            transform: scale(1.02);
+        }
+        .quote-hover .speaker {
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+        .quote-hover:hover .speaker {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-emerald-50 text-slate-800">
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-6xl font-black mb-4 text-emerald-700">
+                🐰 Critter Kitchen Chaos
+            </h1>
+            <p class="text-lg md:text-xl text-emerald-600 mb-2">Lucy & Lala’s Calico Family Fun</p>
+            <p class="text-md md:text-lg text-slate-600">Tiny aprons, tinier stoves, and two big imaginations at work.</p>
+        </header>
+
+        <section id="intro" class="mb-16 bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            <p class="text-lg text-slate-700 leading-relaxed">
+                Step into a world of mini muffins, bunny moms, and stovetop adventures—because today, Lucy and Lala invited their Calico Critters family into the kitchen for some serious pretend play. This section introduces the imaginative world the girls created.
+            </p>
+        </section>
+
+        <section id="today-setup" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-2 text-emerald-600">🍳 Today’s Set-Up</h2>
+            <p class="text-center text-slate-500 mb-8">Click to reveal the details of their kitchen chaos!</p>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div id="set-up-critters" class="card-expandable bg-white p-6 rounded-xl shadow-md cursor-pointer transition-all duration-300">
+                    <h3 class="text-xl font-bold text-emerald-700">The Calico Crew & Kitchen Set</h3>
+                    <div class="content mt-3 text-slate-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li><strong class="font-semibold">Kitchen Play Set (CC1810):</strong> Comes with a refrigerator, stove-unit, sink-unit, and detailed accessories like pans, utensils, food cartons, ice, and more — all in pretty pastel tones. Designed to match the aesthetic of classic Calico Critters homes like the Red Roof Country Home and Sweet Raspberry Home.</li>
+                            <li><strong class="font-semibold">Closest Official Match: French Bulldog Family (Item No.: CC4023):</strong>
+                                <ul class="list-circle list-inside ml-6 space-y-1">
+                                    <li>Set Includes: Dad, Mom, boy, girl, and two babies</li>
+                                    <li>Style: Large floppy ears and cheerful, colorful outfits</li>
+                                    <li>Limited Edition? Yes, this appears on the limited edition roster.</li>
+                                </ul>
+                            </li>
+                            <li>A French Bulldog mom in red gingham</li>
+                            <li>Twin puppies in overalls (clearly the sous chefs)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="set-up-outfits" class="card-expandable bg-white p-6 rounded-xl shadow-md cursor-pointer transition-all duration-300">
+                    <h3 class="text-xl font-bold text-emerald-700">Coordinating Outfits</h3>
+                    <div class="content mt-3 text-slate-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Matching gingham dresses for the girls (because dolls and outfits must coordinate)</li>
+                            <li>Lucy wore cherry red corduroy with a checkered top</li>
+                            <li>Lala paired a navy pinafore with rainbow buttons</li>
+                            <li>In the second scene, they swapped in gingham dresses to match their critter crew.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="play-highlights" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-2 text-emerald-600">👧🏼👧🏼 Play Highlights</h2>
+            <p class="text-center text-slate-500 mb-8">Hover over the quotes to see who said what!</p>
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <div class="flex flex-col sm:flex-row justify-center gap-6 mb-6">
+                    <div class="quote-hover bg-lime-100 p-4 rounded-lg shadow-sm transition-all duration-300 hover:scale-105">
+                        <p class="text-lg italic text-slate-700">“I’m the Doggie Mommy and I say NO EATING before breakfast is ready.”</p>
+                        <p class="speaker text-sm text-lime-800 font-semibold mt-2">— Lucy</p>
+                    </div>
+                    <div class="quote-hover bg-blue-100 p-4 rounded-lg shadow-sm transition-all duration-300 hover:scale-105">
+                        <p class="text-lg italic text-slate-700">“It’s carrot-pepper-cupcake stew.”</p>
+                        <p class="speaker text-sm text-blue-800 font-semibold mt-2">— Lala (stirring an imaginary pot of soup for nearly ten minutes)</p>
+                    </div>
+                </div>
+                <p class="text-lg text-slate-700 leading-relaxed mb-4">
+                    With bowls the size of a fingernail and stovetops you could balance on a slice of toast, the girls created a whole culinary universe. Lucy arranged the critters around the table. Lala assigned chores. One Dog had to clean the (invisible) refrigerator three times. This section brings their imaginative play to life.
+                </p>
+                <div class="grid sm:grid-cols-2 gap-6 mt-8">
+                    <img src="https://i.imgur.com/AtUPPhI.jpeg" alt="Lucy and Lala playing with Calico Critters kitchen" class="w-full h-auto rounded-xl shadow-lg object-cover">
+                    <img src="https://i.imgur.com/XoiYfjq.jpeg" alt="Lucy and Lala focused on their Calico Critters play" class="w-full h-auto rounded-xl shadow-lg object-cover">
+                </div>
+            </div>
+        </section>
+
+        <section id="why-they-love" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-2 text-emerald-600">🏡 Why They Love Calico Critters</h2>
+            <p class="text-center text-slate-500 mb-8">The magic behind their favorite toys.</p>
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <ul class="list-disc list-inside text-lg text-slate-700 space-y-3">
+                    <li>Tiny accessories feel magical</li>
+                    <li>The families can grow (and multiply with every birthday!)</li>
+                    <li>Everything is soft, fuzzy, and full of charm</li>
+                    <li>It sparks hours of story-making without a screen in sight</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="memory-moments" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-2 text-emerald-600">📸 Memory Moments</h2>
+            <p class="text-center text-slate-500 mb-8">Unforgettable moments from their critter kitchen.</p>
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <ul class="list-disc list-inside text-lg text-slate-700 space-y-3">
+                    <li>Lala tucked one critter into the oven for “a warm nap”</li>
+                    <li>Lucy declared the frying pan a bed for the baby puppy</li>
+                    <li>They both clapped when “dinner” was served—one mini bowl of pretend orange juice and a carrot</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer class="text-center border-t border-slate-200 pt-8">
+            <h2 class="text-3xl font-bold mb-4 text-emerald-700">✨ Imagination Unleashed</h2>
+            <p class="text-slate-600">A day of creativity, giggles, and critter culinary adventures.</p>
+        </footer>
+
+    </main>
+
+    <script>
+  <!-- Scripts -->
+  <script type="module">
+    // Firebase SDKs
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+    // ===== Single Source of Truth for firebaseConfig (FIX: removed duplicate declaration) =====
+    const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config)
+      ? JSON.parse(__firebase_config)
+      : {
+          apiKey: 'AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU',
+          authDomain: 'lucyandlala.firebaseapp.com',
+          projectId: 'lucyandlala',
+          storageBucket: 'lucyandlala.firebasestorage.app',
+          messagingSenderId: '422161772278',
+          appId: '1:422161772278:web:a39c41f9ad967d379886d7',
+          measurementId: 'G-JZJK3JWCKH'
+        };
+
+    const appId = (typeof __app_id !== 'undefined') ? __app_id : 'default-app-id';
+    const initialAuthToken = (typeof __initial_auth_token !== 'undefined') ? __initial_auth_token : null;
+
+    let app = null, auth = null, db = null, currentUserId = null;
+
+    // Initialize Firebase if config is available
+    if (firebaseConfig && firebaseConfig.apiKey) {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      console.log('[Init] Firebase initialized.');
+    } else {
+      console.warn('[Init] Missing firebaseConfig. Auth/Pro lock disabled.');
+    }
+
+    async function getAuthenticatedUserId() {
+      if (!auth) return null;
+      return new Promise(resolve => {
+        const unsub = onAuthStateChanged(auth, user => {
+          unsub();
+          if (user) { currentUserId = user.uid; resolve(user.uid); } else { resolve(null); }
+        });
+      });
+    }
+
+    async function getProSubscriberStatus() {
+      if (!db) return false;
+      const userId = await getAuthenticatedUserId();
+      if (!userId) return false;
+      try {
+        const ref = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+        const snap = await getDoc(ref);
+        return snap.exists() && snap.data().isProSubscriber === true;
+      } catch (e) {
+        console.error('[ProCheck] Error:', e);
+        return false;
+      }
+    }
+
+    const releaseDate = new Date('2025-10-1T00:00:00');
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Like button
+      const heart = document.getElementById('likeHeart');
+      if (heart) {
+        heart.addEventListener('click', () => {
+          heart.classList.toggle('liked');
+          heart.setAttribute('aria-pressed', heart.classList.contains('liked'));
+        });
+      }
+
+      // Content lock logic (only if Firebase available)
+      if (!auth || !db) return; // Skip if no Firebase
+
+      if (new Date() < releaseDate) {
+        // Date-locked overlay
+        const main = document.querySelector('main');
+        if (main) {
+          const overlay = document.createElement('div');
+          overlay.className = 'locked-overlay';
+          overlay.innerHTML = `
+            <h3 class="text-3xl font-extrabold text-yellow-900">🔒 Coming Soon!</h3>
+            <p class="text-lg">This adventure unlocks on <strong>October 1, 2025</strong>.</p>
+            <a href="toddler-blog">Back to All Adventures! 🎀</a>
+          `;
+          main.appendChild(overlay);
+        }
+        return;
+      }
+
+      // Pro subscriber check
+      const isPro = await getProSubscriberStatus();
+      if (!isPro) {
+        const main = document.querySelector('main');
+        if (main) {
+          const overlay = document.createElement('div');
+          overlay.className = 'pro-content-overlay';
+          overlay.innerHTML = `
+            <h3 class="text-3xl font-extrabold text-yellow-900">🔒 Pro Content Only</h3>
+            <p class="text-lg">This breakfast adventure is reserved for Lucy & Lala Pro Subscribers.</p>
+            <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank" rel="noopener">Unlock for $10/month</a>
+          `;
+          main.appendChild(overlay);
+        }
+      }
+    });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const expandableCards = document.querySelectorAll('.card-expandable');
+
+            expandableCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    card.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
