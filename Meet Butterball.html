@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lucy & Lala’s New Sidekick: ButterBall 🐾</title>
+  <meta name="description" content="Meet ButterBall, the twins’ fluffy new kitten, and his absolute favorite rainbow caterpillar toy from Petco." />
+  <style>
+    :root{
+      --paper:#ffffff;--ink:#1b1b1f;--muted:#667085;--line:#eceff2;--brand:#2d7aee;--accent:#ffcc73;--maxw:920px
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:clamp(16px,3vw,32px)}
+    .kicker{letter-spacing:.14em;text-transform:uppercase;color:var(--brand);font-weight:700;margin-top:8px}
+    h1{font: clamp(32px,4.4vw,54px)/1.08 ui-serif,Georgia,Times New Roman,serif;margin:10px 0 6px}
+    .dek{font-size:clamp(18px,2.2vw,22px);color:#3a3a42;max-width:70ch;margin-bottom:20px}
+    .meta{display:flex;gap:14px;align-items:center;color:var(--muted);flex-wrap:wrap;margin:10px 0 22px}
+    .dot{width:4px;height:4px;border-radius:50%;background:var(--muted)}
+    article p{margin:16px 0;max-width:74ch}
+    article p.lede::first-letter{float:left;font:72px/0.9 ui-serif,Georgia,serif;color:var(--brand);padding:8px 10px 0 2px}
+    .pull{border-left:4px solid var(--brand);padding:12px 16px;margin:14px 0 20px;background:linear-gradient(90deg,#f6fbff,transparent);font:22px/1.35 ui-serif,Georgia,serif}
+    .features{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff}
+    .features h3{margin:0 0 10px;font-size:18px}
+    .features ul{margin:0;padding-left:1.1rem}
+    .features li{margin:8px 0}
+    footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+    a{color:var(--brand);text-decoration:underline;text-underline-offset:3px}
+  </style>
+
+</head>
+<body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+       
+        // Global variables for Firebase config and app ID
+       const firebaseConfig = {
+    apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+    authDomain: "lucyandlala.firebaseapp.com",
+    projectId: "lucyandlala",
+    storageBucket: "lucyandlala.firebasestorage.app",
+    messagingSenderId: "422161772278",
+    appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+    measurementId: "G-JZJK3JWCKH"
+
+        let app = null;
+        let auth = null;
+        let db = null;
+        let currentUserId = null;
+
+        // Initialize Firebase services only if config is available
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase services initialized.");
+        } else {
+            console.warn("Firebase config not found. Authentication and Pro status will not be available.");
+        }
+        
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            if (!auth) return null;
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            if (!db) return false;
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
+        const releaseDate = new Date('2025-10-7T00:00:00'); /
+        const currentDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Ensure Firebase Auth is ready before checking status
+            if (auth) {
+                 await new Promise(resolve => {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            currentUserId = user.uid;
+                        } else {
+                             // If no user is signed in, attempt anonymous or custom token sign-in
+                            if (initialAuthToken) {
+                                signInWithCustomToken(auth, initialAuthToken)
+                                    .then((userCredential) => {
+                                        console.log("Signed in with custom token:", userCredential.user.uid);
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error signing in with custom token:", error);
+                                        signInAnonymously(auth)
+                                            .then(() => console.log("Signed in anonymously (fallback)."))
+                                            .catch(e => console.error("Error signing in anonymously:", e));
+                                    });
+                            } else {
+                                signInAnonymously(auth)
+                                    .then(() => console.log("Signed in anonymously."))
+                                    .catch(e => console.error("Error signing in anonymously:", e));
+                            }
+                        }
+                        resolve();
+                    });
+                });
+            }
+
+
+            if (currentDate < releaseDate) {
+                // Article is date-locked for everyone
+                document.body.innerHTML = `
+                    <div class="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This delightful adventure will be released on October 7th, 2025!</p>
+                        <p>Check back soon to see Lucy and Lala's book discoveries!</p>
+                        <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                            Back to All Adventures! 🎀
+                        </a>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            } else {
+                // Article is released, now check Pro status
+                const isProSubscriber = await getProSubscriberStatus();
+                if (!isProSubscriber) {
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                        mainContent.innerHTML = `
+                            <div class="pro-content-overlay">
+                                <h3>🔒 Pro Content Only!</h3>
+                                <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                                <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                            </div>
+                            ${mainContent.innerHTML}
+                        `;
+                        // Optionally blur or reduce opacity of content behind overlay
+                        const contentToBlur = mainContent.querySelector('section');
+                        if (contentToBlur) {
+                            contentToBlur.style.filter = 'blur(5px)';
+                            contentToBlur.style.pointerEvents = 'none';
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
+                    📚  ✨
+                </h1>
+                <p class="text-xl md:text-2xl text-pink-800 font-semibold">
+                    Exploring new stories with Lucy and Lala! 📖💖
+                </p>
+            </div>
+        </header>
+
+</head>
+<body>
+  <main class="wrap">
+    <div class="kicker">Home & Pets</div>
+    <h1>Lucy & Lala’s New Sidekick: ButterBall 🐾</h1>
+    <p class="dek">The twins just welcomed ButterBall, a cloud-soft kitten with an athlete’s pounce and a serious obsession with one rainbow caterpillar toy.</p>
+
+    <div class="meta">
+      <span><strong>Words & Edit:</strong> Brooke Ross</span>
+      <span class="dot"></span>
+      <span><strong>Photography:</strong> ButterBall at play</span>
+      <span class="dot"></span>
+      <span>Published: <time datetime="2025-08-21">Aug 21, 2025</time></span>
+    </div>
+
+    <article>
+      <p class="lede">Lucy and Lala have officially welcomed a new family member—ButterBall, the fluffiest little bundle of purrs you’ve ever seen. His favorite activity so far? Chasing his rainbow caterpillar toy from Petco.</p>
+      <p>Within minutes of unwrapping it, ButterBall pounced like a tiny jungle cat, batting at the fuzzy stripes and swatting at the purple feather tail with the kind of concentration only a kitten can manage. Lucy calls it his “happy worm,” while Lala insists it’s a “rainbow monster.” Both are right. The toy wiggles across the floor with just enough bounce to trigger kitten zoomies on demand.</p>
+      <div class="pull">“Between snack breaks and cat naps, ButterBall trails the twins room‑to‑room—sometimes dragging his prize like a tiny trophy.”</div>
+      <p>It’s safe to say: this Petco find is already a household classic. The colors photograph beautifully, the feathers keep the game fresh, and the plush body stands up to all the joyful chomps. For a kitten with a big personality, it’s the perfect sidekick.</p>
+
+      <img src="https://i.imgur.com/AeCbKea.jpeg" alt="Kittie" width="900" height="900">
+      <section class="features" aria-label="Kitten-Approved Features">
+        <h3>Kitten‑Approved Features of the Rainbow Caterpillar Toy</h3>
+        <video width="1000" height="1000" controls>
+<source src=https://i.imgur.com/XhtuZcr.mp4" type="video/mp4">
+        <ul>
+          <li><strong>High‑contrast colors</strong> that keep tiny hunters engaged.</li>
+          <li><strong>Fluffy, plush texture</strong> that’s satisfying for paws (and little teeth) to grab.</li>
+          <li><strong>Feather tail</strong> that adds irresistible wiggle and swish.</li>
+          <li><strong>Lightweight build</strong> so kittens can carry it around like a victory flag.</li>
+        </ul>
+        <p style="margin-top:12px"><em>Find similar toys at</em> <a href="https://www.petco.com/" target="_blank" rel="noopener">Petco</a>.</p>
+      </section>
+
+      <p style="margin-top:18px">Welcome home, ButterBall. May your naps be long, your snacks be crunchy, and your rainbow monster forever wiggly.</p>
+    </article>
+
+    <footer>
+      <p>Part of our ongoing series on Lucy & Lala’s everyday adventures in play, pets, and gentle technology.</p>
+    </footer>
+  </main>
+</body>
+</html>
