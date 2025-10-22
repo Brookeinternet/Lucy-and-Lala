@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lala — Cozy Bear Romper (Editorial Feature)</title>
+  <meta name="description" content="An editorial profile of Lala, the AI toddler, wearing a plush bear romper from Etsy seller LearnitBro." />
+  <style>
+    :root{
+      --paper:#ffffff;
+      --ink:#17181b;
+      --muted:#6b7280;
+      --line:#eceff2;
+      --brand:#8b5a2b;   /* toffee brown */
+      --accent:#e6b39a;  /* warm peach */
+      --maxw:1000px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:clamp(16px,3vw,40px)}
+    .kicker{letter-spacing:.14em;text-transform:uppercase;color:var(--brand);font-weight:700;margin-top:8px}
+    h1{font: clamp(32px,4.5vw,56px)/1.05 ui-serif,Georgia,Times New Roman,serif;margin:12px 0 8px}
+    .dek{font-size:clamp(18px,2.2vw,22px);color:#343a46;max-width:70ch}
+    .meta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:18px 0 28px;color:var(--muted)}
+    .dot{width:4px;height:4px;border-radius:50%;background:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr;gap:28px}
+    @media(min-width:920px){.grid{grid-template-columns:minmax(0,1fr) 330px;gap:42px}}
+    article p{margin:16px 0;max-width:74ch}
+    article p.lede::first-letter{float:left;font:80px/0.8 ui-serif,Georgia,serif;color:var(--brand);padding:8px 10px 0 2px}
+    hr.rule{border:none;height:1px;background:var(--line);margin:28px 0}
+    .pull{border-left:4px solid var(--brand);padding:12px 16px;margin:10px 0 22px;background:linear-gradient(90deg,#fff9f5,transparent);font:22px/1.35 ui-serif,Georgia,serif}
+    aside.card{position:sticky;top:24px;border:1px solid var(--line);border-radius:16px;padding:18px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.04)}
+    aside.card h3{margin:0 0 10px;font-size:18px}
+    .facts{display:grid;grid-template-columns:1fr;gap:10px;font-size:14px;color:#2b2f36}
+    .facts div{display:flex;gap:8px}
+    .tag{font-weight:600;color:#5c3d1f}
+    a{color:var(--brand);text-decoration:underline;text-underline-offset:3px}
+    .hero{border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.06);background:#faf7f2}
+    .hero img{width:100%;height:auto;display:block}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{border:1px solid var(--line);padding:6px 10px;border-radius:40px;background:#fff}
+    footer.credits{margin-top:40px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+  </style>
+</head>
+  <body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+       
+        // Global variables for Firebase config and app ID
+       const firebaseConfig = {
+    apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+    authDomain: "lucyandlala.firebaseapp.com",
+    projectId: "lucyandlala",
+    storageBucket: "lucyandlala.firebasestorage.app",
+    messagingSenderId: "422161772278",
+    appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+    measurementId: "G-JZJK3JWCKH"
+
+        let app = null;
+        let auth = null;
+        let db = null;
+        let currentUserId = null;
+
+        // Initialize Firebase services only if config is available
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase services initialized.");
+        } else {
+            console.warn("Firebase config not found. Authentication and Pro status will not be available.");
+        }
+        
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            if (!auth) return null;
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            if (!db) return false;
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
+        const releaseDate = new Date('2025-10-7T00:00:00'); /
+        const currentDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Ensure Firebase Auth is ready before checking status
+            if (auth) {
+                 await new Promise(resolve => {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            currentUserId = user.uid;
+                        } else {
+                             // If no user is signed in, attempt anonymous or custom token sign-in
+                            if (initialAuthToken) {
+                                signInWithCustomToken(auth, initialAuthToken)
+                                    .then((userCredential) => {
+                                        console.log("Signed in with custom token:", userCredential.user.uid);
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error signing in with custom token:", error);
+                                        signInAnonymously(auth)
+                                            .then(() => console.log("Signed in anonymously (fallback)."))
+                                            .catch(e => console.error("Error signing in anonymously:", e));
+                                    });
+                            } else {
+                                signInAnonymously(auth)
+                                    .then(() => console.log("Signed in anonymously."))
+                                    .catch(e => console.error("Error signing in anonymously:", e));
+                            }
+                        }
+                        resolve();
+                    });
+                });
+            }
+
+
+            if (currentDate < releaseDate) {
+                // Article is date-locked for everyone
+                document.body.innerHTML = `
+                    <div class="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This delightful adventure will be released on October 7th, 2025!</p>
+                        <p>Check back soon to see Lucy and Lala's book discoveries!</p>
+                        <a href="toddler-blog" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                            Back to All Adventures! 🎀
+                        </a>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            } else {
+                // Article is released, now check Pro status
+                const isProSubscriber = await getProSubscriberStatus();
+                if (!isProSubscriber) {
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                        mainContent.innerHTML = `
+                            <div class="pro-content-overlay">
+                                <h3>🔒 Pro Content Only!</h3>
+                                <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                                <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                            </div>
+                            ${mainContent.innerHTML}
+                        `;
+                        // Optionally blur or reduce opacity of content behind overlay
+                        const contentToBlur = mainContent.querySelector('section');
+                        if (contentToBlur) {
+                            contentToBlur.style.filter = 'blur(5px)';
+                            contentToBlur.style.pointerEvents = 'none';
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <div class="min-h-screen flex flex-col items-center py-8 px-4 w-full">
+        <!-- Header Section -->
+        <header class="w-full container mx-auto text-center mb-12">
+            <div class="header-bg rounded-3xl p-6 shadow-xl mb-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-2 drop-shadow-lg">
+                    📚  ✨
+                </h1>
+                <p class="text-xl md:text-2xl text-pink-800 font-semibold">
+                    Exploring new stories with Lucy and Lala! 📖💖
+                </p>
+            </div>
+        </header>
+
+<body>
+  <main class="wrap">
+    <div class="hero">
+      <!-- Swap the src below with your hosted image of Lala in the bear romper -->
+      <img src="https://i.imgur.com/ITMZSrs.jpeg" alt="Lala cuddled in a plush bear romper, cozy on a mall day with Dad" />
+    </div>
+
+    <div class="kicker">Editorial Feature</div>
+    <h1>Lala, in Bear Mode — Comfort as a Point of View</h1>
+    <p class="dek">On an ordinary mall afternoon, Lala turns into a teddy-bear muse: soft ears, softer fleece, and a quiet philosophy that the best style starts with feeling safe and warm.</p>
+
+    <div class="meta byline">
+      <span><strong>Words & Edit:</strong> Brooke Ross</span>
+      <span class="dot"></span>
+      <span><strong>Photography:</strong> Daddy & Lala</span>
+      <span class="dot"></span>
+      <span>Published: <time datetime="2025-08-21">Aug 21, 2025</time></span>
+    </div>
+
+    <div class="grid">
+      <article>
+        <p class="lede">Comfort is a story we wear. For Lala, it looks like rounded bear ears, polar fleece that forgives snack crumbs, and a hood that makes a busy mall feel like a den.</p>
+        <p>Her romper — the <a target="_blank" rel="noopener" href="https://www.etsy.com/listing/1754843615/comfy-bear-shaped-polar-fleece-hooded">Comfy Bear-Shaped Polar Fleece Hooded Romper</a> — comes from the small but wildly charming Etsy shop <a target="_blank" rel="noopener" href="https://www.etsy.com/shop/LearnItBro?ref=shop-header-name&listing_id=1754843615">LearnitBro</a>. It’s plush without being precious, lined where it matters, and cut generously so little shoulders can shrug, nap, and wiggle through an afternoon of escalators and window displays.</p>
+        <div class="pull">“The hood goes up, the world goes quiet, and Lala becomes a bear cub carried through bright corridors.”</div>
+        <p>Good children’s design is a choreography of details: zips that don’t pinch, cuffs that don’t fight tiny wrists, fleece that breathes just enough under mall A/C. LearnitBro understands this, sewing whimsy into function so parents get longevity while kids get the costume-level joy of playing pretend in public.</p>
+        <p>The look photographs beautifully — warm brown against chrome and glass — but the feeling is the headline. Nestled on her dad’s arm, Lala’s expression softens into that toddler half-pout, half-dream state that says, <em>I am exactly where I should be.</em></p>
+        <hr class="rule" />
+        <h2 class="caps">About the Piece</h2>
+        <p><strong>Name:</strong> Comfy Bear-Shaped Polar Fleece Hooded Romper</p>
+        <p><strong>Maker:</strong> <a target="_blank" rel="noopener" href="https://www.etsy.com/shop/LearnItBro">LearnitBro on Etsy</a> — a small shop focused on playful, practical fleece designs crafted for real movement and real naps.</p>
+        <p><strong>Why it works on Lala:</strong> The tactile plush quiets busy spaces; the roomy cut suits her unhurried, observant temperament; and the bear ears turn a simple errand into a little theater.</p>
+        <hr class="rule" />
+        <h2 class="caps">The Editorial Read</h2>
+        <p>Lala’s style language isn’t trend-chasing. It’s sensory-forward — textures that soothe, silhouettes that invite play, colors that feel like memories. Here, the romper isn’t an outfit; it’s a mood board: warm lighting, hand-in-hand with Dad, a detour through H&M, the soft thrum of weekday shoppers.</p>
+        <p>AI or not, the resonance is human. We recognize ourselves in the micro-moments: the weight of a child against a shoulder, the way a hood turns a public space private. Fashion does that sometimes — repairs the day with kindness.</p>
+      </article>
+
+      <aside class="card" aria-label="Quick facts about Lala's look">
+        <h3>Quick facts</h3>
+        <div class="facts">
+          <div><span class="tag">Signature:</span> cozy textures, gentle palettes</div>
+          <div><span class="tag">Hero piece:</span> <a target="_blank" rel="noopener" href="https://www.etsy.com/listing/1754843615/comfy-bear-shaped-polar-fleece-hooded">Bear Fleece Romper</a></div>
+          <div><span class="tag">Maker:</span> <a target="_blank" rel="noopener" href="https://www.etsy.com/shop/LearnItBro">LearnitBro (Etsy)</a></div>
+          <div><span class="tag">Pairs with:</span> ribbed leggings, soft socks, parent’s shoulder</div>
+          <div><span class="tag">Vibe:</span> storybook calm meets mall-glow modern</div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="credits">
+      <div class="chips" role="list">
+        <span class="chip">AI Character & Direction: Lala</span>
+        <span class="chip">Location: Suburban mall, weekday afternoon</span>
+        <span class="chip">Styling: Comfort-first, child-led</span>
+      </div>
+      <p style="margin-top:10px">Part of our ongoing series on gentle technology and the aesthetics of early childhood.</p>
+    </footer>
+  </main>
+</body>
+</html>
