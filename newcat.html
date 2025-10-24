@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Plush Cousin from Etsy — Lucy & Lala Meet ButterBall’s Lookalike</title>
+  <meta name="description" content="Lucy and Lala meet their plush kitten cousin from Etsy — a lifelike handmade creation from KittenBlackUSA." />
+  <style>
+    :root {
+      --bg: #fffdfb;
+      --ink: #1f1f23;
+      --muted: #64666b;
+      --brand: #c45c2e;
+      --accent: #ffe5d0;
+      --line: #ebebeb;
+      --maxw: 860px;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+      line-height: 1.6;
+    }
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: clamp(16px, 4vw, 36px);
+    }
+    h1 {
+      font-family: ui-serif, Georgia, serif;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.1;
+      margin: 0 0 10px;
+    }
+    .dek {
+      font-size: clamp(17px, 2vw, 21px);
+      color: var(--muted);
+      margin-bottom: 24px;
+      max-width: 70ch;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--muted);
+      align-self: center;
+    }
+    article p {
+      max-width: 72ch;
+      margin: 18px 0;
+    }
+    article p.lede::first-letter {
+      float: left;
+      font: 72px/0.9 ui-serif, Georgia, serif;
+      color: var(--brand);
+      padding: 8px 10px 0 2px;
+    }
+    .pull {
+      border-left: 4px solid var(--brand);
+      padding: 12px 16px;
+      background: linear-gradient(90deg, #fff7f0, transparent);
+      border-radius: 6px;
+      margin: 24px 0;
+      font: 20px/1.4 ui-serif, Georgia, serif;
+      color: var(--ink);
+    }
+    footer {
+      border-top: 1px solid var(--line);
+      margin-top: 36px;
+      padding-top: 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    a {
+      color: var(--brand);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .readmore {
+      display: inline-block;
+      margin-top: 22px;
+      background: var(--brand);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background .3s;
+    }
+    .readmore:hover {
+      background: #9b3e1f;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin: 30px 0;
+    }
+    .gallery img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body class="antialiased text-gray-600">
+    <!-- Content Lock Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+       
+        // Global variables for Firebase config and app ID
+       const firebaseConfig = {
+    apiKey: "AIzaSyBaVuIUd_iVRiR5LEeCoPtE0QphcxMLBQU",
+    authDomain: "lucyandlala.firebaseapp.com",
+    projectId: "lucyandlala",
+    storageBucket: "lucyandlala.firebasestorage.app",
+    messagingSenderId: "422161772278",
+    appId: "1:422161772278:web:a39c41f9ad967d379886d7",
+    measurementId: "G-JZJK3JWCKH"
+
+        let app = null;
+        let auth = null;
+        let db = null;
+        let currentUserId = null;
+
+        // Initialize Firebase services only if config is available
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase services initialized.");
+        } else {
+            console.warn("Firebase config not found. Authentication and Pro status will not be available.");
+        }
+        
+
+        /**
+         * Gets the current authenticated user's UID.
+         * @returns {Promise<string|null>} The user's UID or null if not authenticated.
+         */
+        async function getAuthenticatedUserId() {
+            if (!auth) return null;
+            return new Promise(resolve => {
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    unsubscribe(); // Stop listening once we have a user
+                    if (user) {
+                        currentUserId = user.uid;
+                        resolve(user.uid);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Fetches a user's subscriber status from Firestore.
+         * @returns {Promise<boolean>} True if the user is a Pro Subscriber, false otherwise.
+         */
+        async function getProSubscriberStatus() {
+            if (!db) return false;
+            const userId = await getAuthenticatedUserId();
+
+            if (!userId) {
+                console.warn("Cannot get subscriber status: User not authenticated.");
+                return false;
+            }
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, 'subscription');
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    return data.isProSubscriber === true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error fetching subscriber status:", error);
+                return false;
+            }
+        }
+
+        const releaseDate = new Date('2025-10-29T00:00:00'); /
+        const currentDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Ensure Firebase Auth is ready before checking status
+            if (auth) {
+                 await new Promise(resolve => {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            currentUserId = user.uid;
+                        } else {
+                             // If no user is signed in, attempt anonymous or custom token sign-in
+                            if (initialAuthToken) {
+                                signInWithCustomToken(auth, initialAuthToken)
+                                    .then((userCredential) => {
+                                        console.log("Signed in with custom token:", userCredential.user.uid);
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error signing in with custom token:", error);
+                                        signInAnonymously(auth)
+                                            .then(() => console.log("Signed in anonymously (fallback)."))
+                                            .catch(e => console.error("Error signing in anonymously:", e));
+                                    });
+                            } else {
+                                signInAnonymously(auth)
+                                    .then(() => console.log("Signed in anonymously."))
+                                    .catch(e => console.error("Error signing in anonymously:", e));
+                            }
+                        }
+                        resolve();
+                    });
+                });
+            }
+
+
+            if (currentDate < releaseDate) {
+                // Article is date-locked for everyone
+                document.body.innerHTML = `
+                    <div class="locked-overlay">
+                        <h3>🔒 Coming Soon!</h3>
+                        <p>This delightful adventure will be released on October 29th, 2025!</p>
+                        <p>Check back soon to see Lucy and Lala's book discoveries!</p>
+                        <a href="index.html" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors">
+                            Back to All Adventures! 🎀
+                        </a>
+                    </div>
+                `;
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when locked
+            } else {
+                // Article is released, now check Pro status
+                const isProSubscriber = await getProSubscriberStatus();
+                if (!isProSubscriber) {
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        mainContent.style.position = 'relative'; // Ensure overlay positions correctly
+                        mainContent.innerHTML = `
+                            <div class="pro-content-overlay">
+                                <h3>🔒 Pro Content Only!</h3>
+                                <p>This exclusive adventure is reserved for Lucy and Lala Pro Subscribers.</p>
+                                <a href="https://buy.stripe.com/eVq00ldtC8408cxfZwabK00" target="_blank">Unlock Now for $10/month!</a>
+                            </div>
+                            ${mainContent.innerHTML}
+                        `;
+                        // Optionally blur or reduce opacity of content behind overlay
+                        const contentToBlur = mainContent.querySelector('section');
+                        if (contentToBlur) {
+                            contentToBlur.style.filter = 'blur(5px)';
+                            contentToBlur.style.pointerEvents = 'none';
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+  <main class="wrap">
+    <h1>The Plush Cousin from Etsy 🐱</h1>
+    <p class="dek">Lucy & Lala meet their lifelike plush kitten from <a href="https://www.etsy.com/shop/KittenBlackUA" target="_blank">KittenBlackUSA</a> — a handmade creation so real, even ButterBall looked twice.</p>
+
+    <div class="meta">
+      <span><strong>Words & Edit:</strong> Brooke Ross</span>
+      <span class="dot"></span>
+      <span><strong>Photography:</strong> Lucy & Lala’s Playroom</span>
+      <span class="dot"></span>
+      <span>Published: <time datetime="2025-08-22">Aug 22, 2025</time></span>
+    </div>
+
+    <div class="gallery">
+      <img src="https://i.imgur.com/iE8iXtJ.jpeg" alt="Lucy and Lala with their plush kitten on the couch" />
+      <img src="https://i.imgur.com/sOvv0FF.jpeg" alt="Close up of the handmade plush kitten from Etsy" />
+      <img src="https://i.imgur.com/19Ug8Rj.jpeg" alt="Lifelike details on the Etsy plush kitten" />
+      <img src="https://i.imgur.com/Og0zGfw.jpeg" alt="Lucy showing the plush kitten to ButterBall" />
+      <img src="https://i.imgur.com/T5RUtkK.jpeg" alt="Lala cuddling with the plush kitten" />
+    </div>
+
+    <article>
+      <p class="lede">When a lifelike plush kitten arrived from <a href="https://www.etsy.com/shop/KittenBlackUA" target="_blank">KittenBlackUSA</a>, Lucy and Lala thought they’d met ButterBall’s twin. Handmade, soft, and startlingly realistic, the Etsy plush instantly became part of the family. It wasn’t just a toy — it was an experience: the kind that sparks giggles, storytelling, and tea parties that last all afternoon.</p>
+
+      <div class="pull">“When Lucy reached out to touch it, she gasped — ‘ButterBall?’ For a second, even the adults hesitated. The craftsmanship was that good.”</div>
+
+      <p>Every stitch on the plush tells its own story. The artist behind <strong>KittenBlackUSA</strong> spent countless hours layering ultra-soft faux fur, hand-painting the tiny pink nose, and shaping delicate whiskers one by one. The glass eyes, set beneath soft eyelids, gleam with a touch of mischief that feels almost alive. You can tell this isn’t just sewn together — it’s sculpted with love.</p>
+
+      <p>The twins couldn’t stop fussing over their new friend. Lala immediately made space for it in her doll stroller, declaring that “ButterBall’s cousin needs fresh air too!” Lucy, meanwhile, insisted on wrapping it in a tiny blanket before introducing it to their other plushies. Before long, the playroom became a cozy little pet café — complete with make-believe saucers of milk and catnap corners.</p>
+
+      <p>Created by artisans at <a href="https://www.etsy.com/shop/KittenBlackUA" target="_blank">KittenBlackUSA</a>, the <a href="https://www.etsy.com/listing/4349738744/lifesize-kitten-peach-ooak-artist" target="_blank">Lifesize Kitten Peach OOAK Artist Plush</a> is a marvel of handmade detail. Each whisker and paw pad is crafted with such care it feels alive. Priced around <strong>$120</strong>, it’s part toy, part art piece — the perfect addition to the twins’ imaginative world. The artist notes that no two kittens are ever the same — each one has its own pose, fur tone, and expression, just like real cats.</p>
+
+      <p>As the evening light spilled across the playroom, ButterBall — the real cat — approached curiously. For a heartbeat, he froze, tail twitching, as if meeting his mirror image. The twins erupted into laughter, and even ButterBall seemed amused, batting gently at the toy’s paw before curling up beside it. It was the sweetest approval a plush could ever receive.</p>
+
+      <p>Now, ButterBall and his plush cousin coexist peacefully — one purring, one perfectly still, both loved equally. Sometimes the twins whisper secrets to both, and sometimes they laugh when guests can’t tell which one is real. It’s more than just a story about a stuffed toy — it’s a reminder of how imagination can make something handmade feel alive.</p>
+
+      <p>For parents and collectors, this plush isn’t just cute — it’s durable, ethically made, and designed to be cherished for years. The Etsy seller ships worldwide, packaging each kitten in a custom gift box with care instructions and a handwritten thank-you note. It’s these touches that make small businesses like this one so magical.</p>
+
+      <p>Whether you’re looking for a companion for your child, or a display piece for your collection, <a href="https://www.etsy.com/shop/KittenBlackUA" target="_blank">KittenBlackUSA</a> offers something truly heartwarming: a blend of artistry and tenderness stitched into every seam.</p>
+
+      <a href="https://www.etsy.com/listing/4349738744/lifesize-kitten-peach-ooak-artist" class="readmore" target="_blank">Shop the Lifesize Kitten Peach Plush →</a>
+    <p>The box that arrived was unassuming — plain cardboard, taped at the seams — but the weight of it carried promise. When Lucy and Lala leaned over the table to watch it open, they already knew something special was inside. Their mother peeled back the layers of tape and paper until the surprise emerged: a lifelike plush kitten, peach-striped and impossibly soft, handmade by the artist behind <a href="https://www.etsy.com/shop/KittenBlackUA" target="_blank">KittenBlackUSA</a> on Etsy.</p>
+
+<p>The listing had called it a lifesize kitten, peach, one-of-a-kind artist creation (see it <a href="https://www.etsy.com/listing/4349738744/lifesize-kitten-peach-ooak-artist" target="_blank">here</a>). The Etsy shop itself, <a href="https://www.etsy.com/shop/KittenBlackUA" target="_blank">KittenBlackUA</a>, was devoted to hand-crafted plush cats so realistic they straddled the line between toy and art piece.</p>
+
+<p>When the twins first saw it, they went quiet. The plush’s fur was patterned in stripes of warm apricot and cream, its paws tipped in white, its blue eyes glassy and alive with detail. One of the girls reached out slowly, almost reverently, pressing her palm gently onto its head as if she might scare it away.</p>
+
+<p>“Kitty,” she whispered, and the spell was cast.</p>
+
+<p>From then on, this plush wasn’t just fabric and stuffing. It was ButterBall’s cousin — the calmer one, the indoor one, the friend who never ran from hugs or hid under the couch. Unlike the rag-doll Siamese they had chased in the backyard, this cousin sat patiently, waiting for endless tea parties and story times.</p>
+
+<p>The artistry of it mattered, too. KittenBlackUA had stitched this cat with a kind of devotion rare in a world of fast toys: whiskers sewn just so, ears turned with careful angles, tiny imperfections in the hand-painting that made the kitten feel lived-in, real. Each detail told the twins that someone, somewhere, had poured hours of care into this creature before sending it across the world to land in their home.</p>
+
+<p>To Lucy and Lala, that detail was invisible but felt. They simply accepted him as real. In their minds, he would curl up beside them for naps, peek from the stroller during walks, and sleep near the pillows at night.</p>
+
+<p>The magic wasn’t only in the plush itself — it was in how quickly the girls made him part of their world. In one afternoon, an Etsy package became kin, a lifelike creation transformed into their cat. He would never scratch or run, but he would always listen.</p>
+
+<p>And in the twins’ unfolding story, that was enough.</p>
+
+</article>
+
+    <footer>
+      <p>Part of the <strong>Lucy & Lala Collection</strong> — stories exploring their world of handmade charm, pets, and AI play.</p>
+    </footer>
+  </main>
+</body>
+</html>
